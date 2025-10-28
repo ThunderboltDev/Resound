@@ -3,16 +3,20 @@
   "type": "module",
   "scripts": {
     "dev": "convex dev",
-    "setup": "convex dev --until-success"
+    "setup": "convex dev --until-success",
+    "lint": "pnpm exec biome check --write"
   },
   "exports": {
     "./convex": "./convex/*.ts"
   },
   "devDependencies": {
+    "@types/node": "^20.19.9",
     "@workspace/typescript-config": "workspace:*",
     "typescript": "latest"
   },
   "dependencies": {
-    "convex": "^1.28.0"
+    "convex": "^1.28.0",
+    "convex-helpers": "^0.1.104",
+    "jose": "^6.1.0"
   }
 }

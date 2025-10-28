@@ -7,13 +7,12 @@
     "dev": "next dev --turbopack --port 3001",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "lint": "pnpm exec biome check --write",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@workspace/backend": "workspace:*",
-    "@workspace/math": "workspace:*",
+    "@workspace/config": "workspace:*",
     "@workspace/ui": "workspace:*",
     "convex": "^1.28.0",
     "lucide-react": "^0.475.0",
@@ -26,7 +25,6 @@
     "@types/node": "^20.19.9",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
-    "@workspace/eslint-config": "workspace:^",
     "@workspace/typescript-config": "workspace:*",
     "typescript": "^5.9.2"
   }

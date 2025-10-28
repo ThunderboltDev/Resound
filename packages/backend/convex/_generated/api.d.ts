@@ -8,7 +8,11 @@
  * @module
  */
 
-import type * as users from "../users.js";
+import type * as account from "../account.js";
+import type * as adapter from "../adapter.js";
+import type * as http from "../http.js";
+import type * as session from "../session.js";
+import type * as user from "../user.js";
 
 import type {
   ApiFromModules,
@@ -25,7 +29,11 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  users: typeof users;
+  account: typeof account;
+  adapter: typeof adapter;
+  http: typeof http;
+  session: typeof session;
+  user: typeof user;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

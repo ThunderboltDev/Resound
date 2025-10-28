@@ -6,6 +6,6 @@
       "@workspace/backend/*": ["./*"]
     }
   },
-  "include": ["src"],
+  "include": ["convex"],
   "exclude": ["node_modules"]
 }
