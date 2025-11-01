@@ -1,6 +1,7 @@
 "use client";
 
 import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { Provider } from "jotai";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type { ReactNode } from "react";
 
@@ -19,7 +20,9 @@ export function Providers({ children }: { children: ReactNode }) {
       disableTransitionOnChange
       enableColorScheme
     >
-      <ConvexProvider client={convex}>{children}</ConvexProvider>
+      <ConvexProvider client={convex}>
+        <Provider>{children}</Provider>
+      </ConvexProvider>
     </NextThemesProvider>
   );
 }

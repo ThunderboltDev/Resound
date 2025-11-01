@@ -23,12 +23,14 @@ const Toaster = ({ ...props }: ToasterProps) => (
       ),
     }}
     position="top-center"
-    theme="light"
+    theme="system"
     toastOptions={{
       classNames: {
         title: "text-[15px] font-normal text-secondary-foreground",
-        toast: "!py-2 !px-4 gap-3 items-center",
-        closeButton: "text-danger",
+        toast:
+          "!py-2 !px-4 gap-3 items-center !bg-secondary !text-foreground !border-border",
+        closeButton:
+          "!bg-secondary !hover:bg-muted !text-secondary-foreground !border-border",
       },
     }}
     {...props}

@@ -25,6 +25,11 @@ if (!process.env.CONVEX_AUTH_PRIVATE_KEY) {
   throw new Error("env variable CONVEX_AUTH_PRIVATE_KEY is missing");
 }
 
+if (!process.env.CONVEX_AUTH_ADAPTER_SECRET) {
+  throw new Error("env variable CONVEX_AUTH_ADAPTER_SECRET is missing");
+}
+
+const secret = process.env.CONVEX_AUTH_ADAPTER_SECRET;
 const authKey = process.env.CONVEX_AUTH_PRIVATE_KEY;
 const siteUrl = process.env.NEXT_PUBLIC_CONVEX_URL?.replace(/.cloud$/, ".site");
 
@@ -70,42 +75,48 @@ const nextAuth = NextAuth({
       if (email?.verificationRequest) return true;
       if (!user.email || !user.id) return false;
 
-      const existingUser = await convex.query(api.user.getUserByEmail, {
+      const existingUser = await convex.query(api.adapter.getUserByEmail, {
         email: user.email,
+        secret,
       });
 
       let userId: Id<"users">;
 
       if (existingUser) {
-        await convex.mutation(api.user.updateUser, {
+        await convex.mutation(api.adapter.updateUser, {
           user: {
             id: existingUser._id,
             lastLogin: Date.now(),
           },
+          secret,
         });
 
         userId = existingUser._id;
       } else {
-        const newUserId = await convex.mutation(api.user.createUser, {
+        const newUserId = await convex.mutation(api.adapter.createUser, {
           user: {
             name: user.name ?? profile?.name ?? "You",
             email: user.email,
             image: user.image ?? (profile?.image as string | undefined),
+
+            plan: "free",
             lastLogin: Date.now(),
           },
+          secret,
         });
 
         userId = newUserId;
       }
 
-      const existingAccount = await convex.query(api.account.getAccount, {
+      const existingAccount = await convex.query(api.adapter.getAccount, {
         provider: account?.provider,
         providerAccountId: account?.providerAccountId,
+        secret,
       });
 
       if (!existingAccount) {
         if (account) {
-          await convex.mutation(api.account.createAccount, {
+          await convex.mutation(api.adapter.linkAccount, {
             account: {
               userId: userId,
               type: account.type ?? "oauth",
@@ -118,15 +129,17 @@ const nextAuth = NextAuth({
               scope: account.scope,
               id_token: account.id_token,
             },
+            secret,
           });
         } else {
-          await convex.mutation(api.account.createAccount, {
+          await convex.mutation(api.adapter.linkAccount, {
             account: {
               userId: userId,
               type: "email",
               provider: "email",
               providerAccountId: user.email,
             },
+            secret,
           });
         }
       }
@@ -150,8 +163,9 @@ const nextAuth = NextAuth({
       const userAgent = cookieStore.get("client-ua")?.value || null;
       const ipAddress = cookieStore.get("client-ip")?.value || null;
 
-      const sessionRecord = await convex.query(api.session.getSession, {
+      const sessionRecord = await convex.query(api.adapter.getSession, {
         sessionToken: session.sessionToken,
+        secret,
       });
 
       if (!sessionRecord) {
@@ -159,11 +173,12 @@ const nextAuth = NextAuth({
       }
 
       if (sessionRecord.userAgent !== userAgent) {
-        await convex.mutation(api.session.updateSession, {
+        await convex.mutation(api.adapter.updateSession, {
           session: {
-            id: sessionRecord._id,
+            sessionToken: sessionRecord.sessionToken,
             userAgent: userAgent ?? undefined,
           },
+          secret,
         });
       }
 
@@ -172,11 +187,12 @@ const nextAuth = NextAuth({
         Date.now() - new Date(sessionRecord.lastActivity).getTime() >
           15 * 60_000
       ) {
-        await convex.mutation(api.session.updateSession, {
+        await convex.mutation(api.adapter.updateSession, {
           session: {
-            id: sessionRecord._id,
+            sessionToken: sessionRecord.sessionToken,
             lastActivity: Date.now(),
           },
+          secret,
         });
       }
 
@@ -192,13 +208,14 @@ const nextAuth = NextAuth({
           const data: GeoResponse = response.data;
 
           if (data && data.status === "success") {
-            await convex.mutation(api.session.updateSession, {
+            await convex.mutation(api.adapter.updateSession, {
               session: {
-                id: sessionRecord._id,
+                sessionToken: sessionRecord.sessionToken,
                 timezone: data.timezone,
                 country: data.country,
                 city: data.city,
               },
+              secret,
             });
           }
         } catch (error) {

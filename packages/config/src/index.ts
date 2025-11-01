@@ -3,8 +3,8 @@ export const isDev = process.env.NODE_ENV === "development";
 export const url = "https://something.vercel.app";
 
 export const config = {
-  name: "EchoFlow",
-  description: "EchoFlow - Support Platform",
+  name: "Resound",
+  description: "Resound - Support Platform",
   url,
   creator: "Thunderbolt",
   themeColor: "#020202",
@@ -12,7 +12,7 @@ export const config = {
   socials: {
     github: "https://github.com/ThunderboltDev",
     discord: "https://discord.com/users/855342398115414037",
-    email: "echoflow999@gmail.com",
+    email: "resound000@gmail.com",
   },
   favicon: "/favicon.ico",
   logo: {

@@ -14,12 +14,12 @@ export const metadata: Metadata = {
   description:
     "Create an account or login on PDF Pal to start interacting with your PDFs with the help of AI. Secure and fast access to all your PDF tools.",
   keywords: [
-    "Echo Flow login",
-    "Echo Flow signin",
-    "Echo Flow signup",
-    "Echo Flow authentication",
-    "Echo Flow access",
-    "Echo Flow create account",
+    "Resound login",
+    "Resound signin",
+    "Resound signup",
+    "Resound authentication",
+    "Resound access",
+    "Resound create account",
   ],
 };
 

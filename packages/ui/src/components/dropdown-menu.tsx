@@ -39,7 +39,7 @@ function DropdownMenuContent({
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
         className={cn(
-          "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-y-auto overflow-x-hidden rounded-md border border-border bg-secondary p-1 text-secondary-foreground shadow-md data-[state=closed]:animate-out data-[state=open]:animate-in",
+          "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 max-h-(--radix-dropdown-menu-content-available-height) min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-y-auto overflow-x-hidden rounded-md border border-border bg-secondary p-1 text-secondary-foreground shadow-sm data-[state=closed]:animate-out data-[state=open]:animate-in",
           className
         )}
         data-slot="dropdown-menu-content"
@@ -74,8 +74,8 @@ function DropdownMenuItem({
         className
       )}
       data-inset={inset}
-      data-slot="dropdown-menu-item"
       data-variant={variant}
+      data-slot="dropdown-menu-item"
       {...props}
     />
   );
@@ -152,7 +152,7 @@ function DropdownMenuLabel({
   return (
     <DropdownMenuPrimitive.Label
       className={cn(
-        "px-2 py-1.5 font-medium text-sm data-[inset]:pl-8",
+        "px-2 py-1 font-medium text-[13px] data-[inset]:pl-8 text-foreground",
         className
       )}
       data-inset={inset}
@@ -228,7 +228,7 @@ function DropdownMenuSubContent({
   return (
     <DropdownMenuPrimitive.SubContent
       className={cn(
-        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-lg data-[state=closed]:animate-out data-[state=open]:animate-in",
+        "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] origin-(--radix-dropdown-menu-content-transform-origin) overflow-hidden rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-sm data-[state=closed]:animate-out data-[state=open]:animate-in",
         className
       )}
       data-slot="dropdown-menu-sub-content"

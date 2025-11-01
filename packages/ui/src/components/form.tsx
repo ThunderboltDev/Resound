@@ -20,7 +20,7 @@ const Form = FormProvider;
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 > = {
   name: TName;
 };
@@ -31,7 +31,7 @@ const FormFieldContext = React.createContext<FormFieldContextValue>(
 
 const FormField = <
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 >({
   ...props
 }: ControllerProps<TFieldValues, TName>) => (
@@ -125,11 +125,16 @@ function FormControl({ ...props }: React.ComponentProps<typeof Slot>) {
 }
 
 function FormDescription({ className, ...props }: React.ComponentProps<"p">) {
-  const { formDescriptionId } = useFormField();
+  const { formDescriptionId, error } = useFormField();
+
+  if (error) return null;
 
   return (
     <p
-      className={cn("text-muted-foreground text-sm", className)}
+      className={cn(
+        "mt-0.75 text-muted-foreground text-sm md:text-xs",
+        className
+      )}
       data-slot="form-description"
       id={formDescriptionId}
       {...props}
@@ -146,17 +151,14 @@ function FormError({ className, ...props }: React.ComponentProps<"p">) {
   }
 
   return (
-    <span
-      className={cn(
-        "mt-0.75 text-left text-danger text-sm md:text-xs",
-        className
-      )}
+    <p
+      className={cn("mt-0.75 text-danger text-sm md:text-xs", className)}
       data-slot="form-error"
       id={formMessageId}
       {...props}
     >
       {body}
-    </span>
+    </p>
   );
 }
 

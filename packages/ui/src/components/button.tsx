@@ -5,17 +5,18 @@ import { cn } from "@workspace/ui/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { ComponentProps } from "react";
 
-const baseClass =
-  "inline-flex items-center justify-center gap-2 shrink-0 " +
-  "transition-all duration-300 ease-out " +
-  "text-sm font-medium whitespace-nowrap " +
-  "rounded-md shadow-sm no-underline cursor-pointer " +
-  "[&_svg]:shrink-0 [&_svg]:pointer-events-none " +
-  "[&_svg:not([class*='size-'])]:size-4 " +
-  "outline-none focus-visible:ring-[3px] focus-visible:ring-border " +
-  "aria-invalid:ring-danger/40 aria-invalid:border-danger " +
-  "aria-busy:opacity-75 aria-busy:saturate-100 aria-busy:cursor-progress " +
-  "disabled:opacity-75 disabled:saturate-0 disabled:cursor-not-allowed ";
+const baseClass = [
+  "inline-flex items-center justify-center gap-2 shrink-0",
+  "transition-all duration-300 ease-out active:scale-[0.97]",
+  "text-sm font-medium whitespace-nowrap",
+  "rounded-md shadow-sm no-underline cursor-pointer",
+  "[&_svg]:shrink-0 [&_svg]:pointer-events-none",
+  "[&_svg:not([class*='size-'])]:size-4",
+  "outline-none focus-visible:ring-[3px] focus-visible:ring-primary/50 focus-visible:border-primary",
+  "aria-invalid:ring-danger/40 aria-invalid:border-danger",
+  "aria-busy:opacity-75 aria-busy:saturate-100 aria-busy:cursor-progress",
+  "disabled:opacity-75 disabled:saturate-0 disabled:cursor-not-allowed",
+];
 
 const buttonVariants = cva(baseClass, {
   variants: {
@@ -33,7 +34,10 @@ const buttonVariants = cva(baseClass, {
         "bg-success text-white hover:bg-success/90 focus-visible:ring-success/50",
       warning:
         "bg-warning text-white hover:bg-warning/90 focus-visible:ring-warning/50",
-      ghost: "bg-transparent text-foreground shadow-none hover:bg-muted",
+      outline:
+        "bg-transparent text-foreground shadow-none border border-border",
+      ghost:
+        "bg-transparent text-foreground shadow-none hover:bg-foreground/10",
     },
     size: {
       default: "h-9 px-4 py-2 has-[>svg]:px-3",
@@ -54,7 +58,6 @@ interface ButtonProps
   extends ComponentProps<"button">,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
-  asLink?: boolean;
 }
 
 function Button({
@@ -68,8 +71,8 @@ function Button({
 
   return (
     <Component
-      className={cn(buttonVariants({ variant, size, className }))}
       data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />
   );

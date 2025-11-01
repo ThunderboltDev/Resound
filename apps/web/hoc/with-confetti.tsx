@@ -26,7 +26,7 @@ const CANVAS_STYLE: CSSProperties = {
   left: 0,
 };
 
-function withConfetti<T extends object>(
+export function withConfetti<T extends object>(
   WrappedComponent: ComponentType<T & WithConfettiProps>
 ) {
   const ConfettiComponent: FC<T> = (props) => {
@@ -79,5 +79,3 @@ function withConfetti<T extends object>(
 
   return ConfettiComponent;
 }
-
-export default withConfetti;

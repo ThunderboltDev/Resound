@@ -1,47 +1,18 @@
 import { v } from "convex/values";
-import { partial } from "convex-helpers/validators";
-import { mutation, query } from "./_generated/server.js";
-import { sessionSchema } from "./schema.js";
+import { mutation } from "./_generated/server";
 
-export const createSession = mutation({
-  args: { session: v.object(sessionSchema) },
-  handler: async (ctx, { session }) => {
-    const existingSession = await ctx.db
-      .query("sessions")
-      .withIndex("sessionToken", (q) =>
-        q.eq("sessionToken", session.sessionToken)
-      )
-      .unique();
+export const deleteSession = mutation({
+  args: { sessionId: v.id("sessions") },
+  handler: async (ctx, { sessionId }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
 
-    if (existingSession) throw new Error("Session already exists");
+    const session = await ctx.db.get(sessionId);
+    if (!session) throw new Error("Session not found");
 
-    return await ctx.db.insert("sessions", session);
-  },
-});
+    if (session.userId !== identity.subject) throw new Error("Forbidden");
 
-export const updateSession = mutation({
-  args: {
-    session: v.object({
-      id: v.id("sessions"),
-      ...partial(sessionSchema),
-    }),
-  },
-  handler: async (ctx, { session: { id, ...data } }) => {
-    const existingSession = await ctx.db.get(id);
-    if (!existingSession) throw new Error("Session not found");
-
-    await ctx.db.patch(id, data);
-  },
-});
-
-export const getSession = query({
-  args: { sessionToken: v.string() },
-  handler: async (ctx, { sessionToken }) => {
-    const session = await ctx.db
-      .query("sessions")
-      .withIndex("sessionToken", (q) => q.eq("sessionToken", sessionToken))
-      .unique();
-
-    return session;
+    await ctx.db.delete(sessionId);
+    return { success: true };
   },
 });

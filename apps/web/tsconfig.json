@@ -18,7 +18,8 @@
     "next.config.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "components/ui/sonner.tsx"
   ],
   "exclude": ["node_modules"]
 }

@@ -4,13 +4,13 @@ import {
   customQuery,
 } from "convex-helpers/server/customFunctions";
 import { partial } from "convex-helpers/validators";
-import { mutation, query } from "./_generated/server";
+import { mutation, query } from "../_generated/server";
 import {
   accountSchema,
   sessionSchema,
   userSchema,
   verificationTokenSchema,
-} from "./schema";
+} from "../schema";
 
 const adapterQuery = customQuery(query, {
   args: { secret: v.string() },
@@ -44,6 +44,18 @@ export const createSession = adapterMutation({
   args: { session: v.object(sessionSchema) },
   handler: async (ctx, { session }) => {
     return await ctx.db.insert("sessions", session);
+  },
+});
+
+export const getSession = adapterQuery({
+  args: { sessionToken: v.string() },
+  handler: async (ctx, { sessionToken }) => {
+    const session = await ctx.db
+      .query("sessions")
+      .withIndex("sessionToken", (q) => q.eq("sessionToken", sessionToken))
+      .unique();
+
+    return session;
   },
 });
 
@@ -103,8 +115,12 @@ export const deleteUser = adapterMutation({
 });
 
 export const getAccount = adapterQuery({
-  args: { provider: v.string(), providerAccountId: v.string() },
+  args: {
+    provider: v.optional(v.string()),
+    providerAccountId: v.optional(v.string()),
+  },
   handler: async (ctx, { provider, providerAccountId }) => {
+    if (!provider || !providerAccountId) return null;
     return await ctx.db
       .query("accounts")
       .withIndex("providerAndAccountId", (q) =>
@@ -193,7 +209,7 @@ export const unlinkAccount = adapterMutation({
 export const updateSession = adapterMutation({
   args: {
     session: v.object({
-      expires: v.number(),
+      ...partial(sessionSchema),
       sessionToken: v.string(),
     }),
   },

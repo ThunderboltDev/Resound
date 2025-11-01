@@ -27,6 +27,7 @@ export const ConvexAdapter: Adapter = {
     const id = await callMutation(api.adapter.createUser, {
       user: toDB({
         ...user,
+        plan: "free",
         lastLogin: Date.now(),
       }),
     });

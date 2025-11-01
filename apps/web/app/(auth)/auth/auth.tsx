@@ -2,8 +2,17 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { sendGTMEvent } from "@next/third-parties/google";
+import { config } from "@workspace/config";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
 import {
   Form,
   FormControl,
@@ -148,111 +157,128 @@ export default function Auth() {
 
   return (
     <div className="grid h-screen place-items-center bg-radial-[circle_at_center] from-accent/15 to-background">
-      <div className="wrapper-sm flex max-w-[400px] flex-col rounded-2xl p-6 text-center shadow-xl bg-secondary">
-        <h2 className="text-4xl">Welcome!</h2>
-        <p className="text-center text-muted-foreground">
-          Create an account or login to continue!
-        </p>
-        <FormSubmitError className="mt-3">{error}</FormSubmitError>
-        <Form {...form}>
-          <form
-            className="mt-4 space-y-3"
-            onSubmit={(e) => {
-              e.preventDefault();
-              form.handleSubmit(handleSubmit)();
-            }}
-          >
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      autoComplete="email"
-                      placeholder="Email"
-                      type="email"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormError />
-                </FormItem>
-              )}
-            />
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-center">
+            <h2>
+              Welcome To{" "}
+              <span className="bg-linear-160 from-primary to-accent bg-clip-text text-transparent">
+                {config.name}
+              </span>
+            </h2>
+          </CardTitle>
+          <CardDescription>
+            <p className="text-center text-base">
+              Create an account or login to continue!
+            </p>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <FormSubmitError className="mt-3">{error}</FormSubmitError>
+          <Form {...form}>
+            <form
+              className="mt-4 space-y-3"
+              onSubmit={(e) => {
+                e.preventDefault();
+                form.handleSubmit(handleSubmit)();
+              }}
+            >
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        autoComplete="email"
+                        placeholder="Email"
+                        type="email"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormError />
+                  </FormItem>
+                )}
+              />
+              <Button
+                variant="primary"
+                className="w-full"
+                disabled={isLoading}
+                aria-busy={isLoading}
+                type="submit"
+              >
+                <Mail className="size-4.5" />
+                Continue with Email
+              </Button>
+            </form>
+          </Form>
+          <div className="relative my-5 h-0.25 w-full bg-muted-foreground">
+            <span className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 bg-secondary p-1 text-muted-foreground text-xs">
+              OR
+            </span>
+          </div>
+          <div className="flex flex-col gap-3">
             <Button
-              className="w-full"
+              variant="muted"
+              className="relative"
               disabled={isLoading}
-              type="submit"
-              variant="primary"
+              aria-busy={isLoading}
+              onClick={async () => handleProvider("google")}
             >
-              <Mail className="size-4.5" />
-              {isLoading ? "Processing..." : "Continue with Email"}
+              <Image
+                alt="Google Logo"
+                className="size-5"
+                src="/providers/google.webp"
+                height={120}
+                width={120}
+              />
+              Continue with Google
+              <Badge
+                variant="gradient"
+                className="-right-2 -translate-y-1/2 absolute top-0 text-[10px] md:text-xs bevel"
+              >
+                Recommended
+              </Badge>
             </Button>
-          </form>
-        </Form>
-        <div className="relative my-5 h-0.25 w-full bg-muted-foreground">
-          <span className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 bg-secondary p-1 text-muted-foreground text-xs">
-            OR
-          </span>
-        </div>
-        <div className="flex flex-col gap-3">
-          <Button
-            className="relative"
-            disabled={isLoading}
-            onClick={async () => handleProvider("google")}
-            variant="muted"
-          >
-            <Image
-              alt="Google Logo"
-              className="size-5"
-              src="/providers/google.webp"
-              height={120}
-              width={120}
-            />
-            Continue with Google
-            <Badge
-              className="-right-2 -translate-y-1/2 absolute top-0 text-[10px] md:text-xs bevel"
-              variant="gradient"
+            <Button
+              variant="muted"
+              disabled={isLoading}
+              aria-busy={isLoading}
+              onClick={async () => handleProvider("github")}
             >
-              Recommended
-            </Badge>
-          </Button>
-          <Button
-            disabled={isLoading}
-            onClick={async () => handleProvider("github")}
-            variant="muted"
-          >
-            <Image
-              alt="GitHub Logo"
-              src="/providers/github.webp"
-              className="size-5 invert"
-              height={120}
-              width={120}
-            />
-            Continue with GitHub
-          </Button>
-        </div>
-        <p className="mt-6 text-center text-muted-foreground text-xs">
-          By continuing, you agree to our{" "}
-          <Link
-            href="/terms-of-service"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Terms of Service
-          </Link>{" "}
-          and{" "}
-          <Link
-            href="/privacy-policy"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Privacy Policy
-          </Link>
-          .
-        </p>
-      </div>
+              <Image
+                alt="GitHub Logo"
+                src="/providers/github.webp"
+                className="size-5 dark:invert"
+                height={120}
+                width={120}
+              />
+              Continue with GitHub
+            </Button>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <p className="mt-6 text-center text-muted-foreground text-xs">
+            By continuing, you agree to our{" "}
+            <Link
+              href="/terms-of-service"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link
+              href="/privacy-policy"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Privacy Policy
+            </Link>
+          </p>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

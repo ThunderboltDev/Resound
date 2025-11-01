@@ -2,6 +2,13 @@
 
 import { sendGTMEvent } from "@next/third-parties/google";
 import { Button } from "@workspace/ui/components/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@workspace/ui/components/card";
 import { RotateCw } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -16,18 +23,23 @@ export default function CheckEmail() {
   }
 
   return (
-    <div className="grid h-screen place-items-center bg-linear-110 from-primary/25 via-background to-accent/25 p-4">
-      <div className="container-md flex flex-col rounded-lg bg-secondary p-6 text-center shadow-2xl">
-        <h2>Check your email</h2>
-        <p className="my-2 text-center text-sm">
-          We sent a magic sign-in link to <strong>{email}</strong>.
-        </p>
-        <p className="text-center text-sm">
-          Didn&apos;t receive it? Check your spam folder or try again.
-        </p>
-        <div className="mt-4 flex justify-center gap-2">
+    <div className="grid h-screen place-items-center bg-radial-[circle_at_center] from-accent/15 to-background">
+      <Card className="wrapper-md p-4">
+        <CardHeader>
+          <CardTitle>
+            <h3 className="text-center">Verify Email</h3>
+          </CardTitle>
+          <CardDescription className="text-center w-full">
+            <p>
+              We sent a magic sign-in link to <strong>{email}</strong>.
+            </p>
+            <p>Didn&apos;t receive it? Check your spam folder or try again.</p>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="mt-4 flex justify-center gap-2 w-full">
           <Button
-            className="hover:[&_svg]:-rotate-360"
+            variant="primary"
+            className="hover:[&_svg]:rotate-360"
             onClick={() => {
               sendGTMEvent({
                 event: "auth",
@@ -37,13 +49,12 @@ export default function CheckEmail() {
 
               router.replace(`/auth?email=${encodeURIComponent(email)}`);
             }}
-            variant="primary"
           >
             <RotateCw className="transition-transform duration-500" />
             Try Again
           </Button>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

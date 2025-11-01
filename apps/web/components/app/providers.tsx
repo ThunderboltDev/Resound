@@ -2,6 +2,7 @@
 
 import { GoogleTagManager } from "@next/third-parties/google";
 import { config } from "@workspace/config";
+import { Toaster } from "@workspace/ui/components/sonner";
 import { ConvexProviderWithAuth, ConvexReactClient } from "convex/react";
 import { MotionConfig } from "framer-motion";
 import type { Session } from "next-auth";
@@ -35,6 +36,7 @@ export function Providers({ children, session }: ProvidersProps) {
           <MotionConfig reducedMotion="user">
             <GoogleTagManager gtmId={config.gtmId} />
             <ThemeToggle />
+            <Toaster />
             {children}
           </MotionConfig>
         </ConvexProviderWithAuth>
