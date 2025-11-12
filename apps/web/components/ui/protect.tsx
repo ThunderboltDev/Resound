@@ -28,7 +28,9 @@ export function Protect({ requiredPlan = "basic", children }: ProtectProps) {
     planOrder.indexOf(subscription.planId) >= planOrder.indexOf(requiredPlan);
 
   if (!hasAccess) {
-    return <LockedOverlay requiredPlan={requiredPlan}>{children}</LockedOverlay>;
+    return (
+      <LockedOverlay requiredPlan={requiredPlan}>{children}</LockedOverlay>
+    );
   }
 
   return <>{children}</>;

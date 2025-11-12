@@ -57,8 +57,8 @@ export function Pricing() {
                 {plan.id === "basic"
                   ? "Perfect for getting started"
                   : plan.id === "plus"
-                  ? "Best for growing teams"
-                  : "For businesses that need it all"}
+                    ? "Best for growing teams"
+                    : "For businesses that need it all"}
               </p>
             </CardHeader>
 

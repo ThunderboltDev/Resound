@@ -15,11 +15,13 @@ type HintProps = {
   align?: "start" | "center" | "end";
 };
 
-export function Hint({ children, text, side, align }: HintProps) {
+export function Hint({ children, text, ...props }: HintProps) {
   return (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
+        <TooltipTrigger asChild {...props}>
+          {children}
+        </TooltipTrigger>
         <TooltipContent>
           <p>{text}</p>
         </TooltipContent>

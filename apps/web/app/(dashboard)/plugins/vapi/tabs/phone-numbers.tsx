@@ -1,46 +1,17 @@
 "use client";
 import { Badge } from "@workspace/ui/components/badge";
-import { Button } from "@workspace/ui/components/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@workspace/ui/components/dropdown-menu";
 import {
   Table,
   TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
 } from "@workspace/ui/components/table";
-import {
-  Check,
-  CheckCircle,
-  Copy,
-  ExternalLink,
-  MoreHorizontal,
-  Phone,
-  PhoneOff,
-  XCircle,
-} from "lucide-react";
-import { toast } from "sonner";
+import { Check, XCircle } from "lucide-react";
 import { useVapiPhoneNumbers } from "@/hooks/use-vapi-data";
 
 export default function PhoneNumbers() {
   const { data: phoneNumbers, isLoading } = useVapiPhoneNumbers();
-
-  const copyToClipboard = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast.success("Copied to clipboard");
-    } catch {
-      toast.error("Failed to copy");
-    }
-  };
 
   return (
     <div className="border-t border">
