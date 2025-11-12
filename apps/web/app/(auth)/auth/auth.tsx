@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { sendGTMEvent } from "@next/third-parties/google";
 import { config } from "@workspace/config";
-import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import {
   Card,
@@ -30,6 +29,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { FaGithub, FaGoogle } from "react-icons/fa";
 import { z } from "zod";
 
 const errorMessages: Record<string, string> = {
@@ -62,7 +62,7 @@ export default function Auth() {
   const router = useRouter();
   const params = useSearchParams();
 
-  const origin = params.get("origin") || "/dashboard";
+  const origin = params.get("origin") || "/org";
   const email = params.get("email") ?? "";
   const errorCode = params.get("error");
 
@@ -156,16 +156,25 @@ export default function Auth() {
   };
 
   return (
-    <div className="grid h-screen place-items-center bg-radial-[circle_at_center] from-accent/15 to-background">
+    <div className="grid h-screen place-items-center bg-radial-[circle_at_center] from-primary/15 to-background">
       <Card>
         <CardHeader>
           <CardTitle className="text-center">
-            <h2>
+            <h1>
               Welcome To{" "}
-              <span className="bg-linear-160 from-primary to-accent bg-clip-text text-transparent">
-                {config.name}
+              <span className="flex items-center justify-center gap-2">
+                <Image
+                  className="size-10"
+                  src="/logo.webp"
+                  alt="Resound Logo"
+                  width={200}
+                  height={200}
+                />
+                <span className=" bg-linear-160 from-primary to-sky-600 bg-clip-text text-transparent">
+                  {config.name}
+                </span>
               </span>
-            </h2>
+            </h1>
           </CardTitle>
           <CardDescription>
             <p className="text-center text-base">
@@ -175,6 +184,31 @@ export default function Auth() {
         </CardHeader>
         <CardContent>
           <FormSubmitError className="mt-3">{error}</FormSubmitError>
+          <div className="flex flex-col gap-3 mt-4">
+            <Button
+              variant="outline"
+              disabled={isLoading}
+              aria-busy={isLoading}
+              onClick={async () => handleProvider("google")}
+            >
+              <FaGoogle />
+              Continue with Google
+            </Button>
+            <Button
+              variant="outline"
+              disabled={isLoading}
+              aria-busy={isLoading}
+              onClick={async () => handleProvider("github")}
+            >
+              <FaGithub />
+              Continue with GitHub
+            </Button>
+          </div>
+          <div className="relative my-5 h-0.25 w-full bg-muted-foreground">
+            <span className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 bg-secondary p-1 text-muted-foreground text-xs">
+              OR
+            </span>
+          </div>
           <Form {...form}>
             <form
               className="mt-4 space-y-3"
@@ -202,7 +236,8 @@ export default function Auth() {
                 )}
               />
               <Button
-                variant="primary"
+                theme="primary"
+                variant="default"
                 className="w-full"
                 disabled={isLoading}
                 aria-busy={isLoading}
@@ -213,50 +248,6 @@ export default function Auth() {
               </Button>
             </form>
           </Form>
-          <div className="relative my-5 h-0.25 w-full bg-muted-foreground">
-            <span className="-translate-x-1/2 -translate-y-1/2 absolute top-1/2 left-1/2 bg-secondary p-1 text-muted-foreground text-xs">
-              OR
-            </span>
-          </div>
-          <div className="flex flex-col gap-3">
-            <Button
-              variant="muted"
-              className="relative"
-              disabled={isLoading}
-              aria-busy={isLoading}
-              onClick={async () => handleProvider("google")}
-            >
-              <Image
-                alt="Google Logo"
-                className="size-5"
-                src="/providers/google.webp"
-                height={120}
-                width={120}
-              />
-              Continue with Google
-              <Badge
-                variant="gradient"
-                className="-right-2 -translate-y-1/2 absolute top-0 text-[10px] md:text-xs bevel"
-              >
-                Recommended
-              </Badge>
-            </Button>
-            <Button
-              variant="muted"
-              disabled={isLoading}
-              aria-busy={isLoading}
-              onClick={async () => handleProvider("github")}
-            >
-              <Image
-                alt="GitHub Logo"
-                src="/providers/github.webp"
-                className="size-5 dark:invert"
-                height={120}
-                width={120}
-              />
-              Continue with GitHub
-            </Button>
-          </div>
         </CardContent>
         <CardFooter>
           <p className="mt-6 text-center text-muted-foreground text-xs">

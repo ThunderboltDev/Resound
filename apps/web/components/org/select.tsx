@@ -27,21 +27,23 @@ export function SelectOrganization({
   organizations,
 }: SelectOrganizationProps) {
   const router = useRouter();
-  const switchOrg = useMutation(api.organization.switchOrganization);
+  const selectOrg = useMutation(api.web.organization.select);
 
   if (!organizations?.length) {
-    return <Button variant="muted">No organizations found</Button>;
+    return <Button variant="transparent">No organizations found</Button>;
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <SidebarMenuButton className="flex items-center">
-          <Building />
-          <div className="flex items-center justify-between w-full">
-            {selectedOrganization?.name ?? "Select organization"}
-            <ArrowUpDown className="size-3.5" />
-          </div>
+        <SidebarMenuButton asChild>
+          <Button variant="transparent">
+            <Building />
+            <div className="flex items-center justify-between w-full">
+              {selectedOrganization?.name ?? "Select organization"}
+              <ArrowUpDown className="size-3.5" />
+            </div>
+          </Button>
         </SidebarMenuButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -52,7 +54,7 @@ export function SelectOrganization({
             return (
               <DropdownMenuItem
                 key={org._id}
-                onClick={() => switchOrg({ orgId: org._id })}
+                onClick={() => selectOrg({ organizationId: org._id })}
                 className="flex justify-between gap-2"
               >
                 {org.name}

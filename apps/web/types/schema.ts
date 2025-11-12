@@ -1,8 +1,9 @@
-import type { Id } from "@workspace/backend/_generated/dataModel";
+import type { Doc } from "@workspace/backend/_generated/dataModel";
 
-export type Organization = {
-  _id: Id<"organizations">;
-  _creationTime: number;
-  name: string;
-  ownerId: Id<"users">;
+export type User = Doc<"users">;
+
+export type Organization = Doc<"organizations">;
+
+export type OrganizationWithMembers = Doc<"organizations"> & {
+  members: Doc<"members">[];
 };

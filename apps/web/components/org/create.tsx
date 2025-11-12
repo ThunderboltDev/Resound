@@ -20,9 +20,10 @@ import {
   FormLabel,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
-import { Spinner } from "@workspace/ui/components/spinner";
+import { Loader } from "@workspace/ui/components/loader";
 import { useMutation } from "convex/react";
-import { HousePlus } from "lucide-react";
+import { Building, HousePlus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -51,7 +52,9 @@ const formSchema = z.object({
 });
 
 export function CreateOrganization() {
-  const createOrg = useMutation(api.organization.createOrganization);
+  const router = useRouter();
+
+  const createOrg = useMutation(api.web.organization.create);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,15 +68,18 @@ export function CreateOrganization() {
   const name = form.watch("name");
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    toast.success("Organization created successfully!");
     try {
       const sanitizedSlug = sanitizeSlug(values.slug);
-      await createOrg({
+
+      const slug = await createOrg({
         name: values.name,
         slug: sanitizedSlug,
       });
+
       form.reset();
       toast.success("Organization created successfully!");
+
+      router.replace(`/org/${slug}`);
     } catch (err) {
       console.error(err);
       toast.error("Failed to create organization.");
@@ -92,12 +98,14 @@ export function CreateOrganization() {
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
           <CardTitle>
-            <h4>Create Organization</h4>
+            <h3 className="flex items-end gap-2">
+              <Building className="inline size-8" /> Create Organization
+            </h3>
           </CardTitle>
         </CardHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardContent className="space-y-4 mb-4">
+            <CardContent className="space-y-4 mb-4 mt-2">
               <FormField
                 control={form.control}
                 name="name"
@@ -131,12 +139,12 @@ export function CreateOrganization() {
             <CardFooter>
               <Button
                 type="submit"
-                variant="primary"
+                theme="primary"
                 className="w-full"
                 disabled={isLoading}
                 aria-busy={isLoading}
               >
-                {isLoading ? <Spinner /> : <HousePlus />}
+                {isLoading ? <Loader /> : <HousePlus />}
                 Create Organization
               </Button>
             </CardFooter>

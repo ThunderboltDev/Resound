@@ -1,39 +1,52 @@
 "use client";
 
 import { api } from "@workspace/backend/_generated/api";
+import { LoadingScreen } from "@workspace/ui/components/loading-screen";
 import { useQuery } from "convex/react";
-import { Loader } from "lucide-react";
 import type { ComponentType } from "react";
+import { createContext, useContext } from "react";
 import { CreateOrganization } from "@/components/org/create";
-import type { Organization } from "@/types/schema";
+import type { Organization, OrganizationWithMembers } from "@/types/schema";
 
-export type PropsWithOrganization<P = object> = P & {
+type OrganizationContextType = {
   selectedOrganization: Organization | null;
-  organizations: Organization[];
+  organizations: OrganizationWithMembers[];
 };
 
+export const OrganizationContext = createContext<OrganizationContextType>({
+  organizations: [],
+  selectedOrganization: null,
+});
+
+export function useOrganization() {
+  return useContext(OrganizationContext);
+}
+
 export function withOrganization<T extends object>(
-  WrappedComponent: ComponentType<PropsWithOrganization<T>>
+  WrappedComponent: ComponentType<T>
 ) {
   function ProtectedPage(props: T) {
-    const organizations = useQuery(api.organization.getUserOrganizations);
-    const selectedOrganization = useQuery(
-      api.organization.getSelectedOrganization
-    );
+    const organizations = useQuery(api.web.organization.getAll);
+    const selectedOrganization = useQuery(api.web.organization.selected);
 
-    if (selectedOrganization === undefined || organizations === undefined)
-      return <Loader />;
+    if (selectedOrganization === undefined || organizations === undefined) {
+      return <LoadingScreen />;
+    }
 
     if (!organizations.length) {
       return <CreateOrganization />;
     }
 
     return (
-      <WrappedComponent
-        selectedOrganization={selectedOrganization}
-        organizations={organizations}
-        {...props}
-      />
+      <OrganizationContext.Provider
+        value={{ organizations, selectedOrganization }}
+      >
+        <WrappedComponent
+          selectedOrganization={selectedOrganization}
+          organizations={organizations}
+          {...props}
+        />
+      </OrganizationContext.Provider>
     );
   }
 

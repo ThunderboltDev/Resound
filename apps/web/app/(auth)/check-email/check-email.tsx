@@ -23,13 +23,13 @@ export default function CheckEmail() {
   }
 
   return (
-    <div className="grid h-screen place-items-center bg-radial-[circle_at_center] from-accent/15 to-background">
+    <div className="grid h-screen place-items-center bg-radial-[circle_at_center] from-primary/15 to-background">
       <Card className="wrapper-md p-4">
         <CardHeader>
           <CardTitle>
-            <h3 className="text-center">Verify Email</h3>
+            <h2 className="text-center">Verify Email</h2>
           </CardTitle>
-          <CardDescription className="text-center w-full">
+          <CardDescription className="text-center w-full space-y-2">
             <p>
               We sent a magic sign-in link to <strong>{email}</strong>.
             </p>
@@ -38,7 +38,8 @@ export default function CheckEmail() {
         </CardHeader>
         <CardContent className="mt-4 flex justify-center gap-2 w-full">
           <Button
-            variant="primary"
+            theme="primary"
+            variant="default"
             className="hover:[&_svg]:rotate-360"
             onClick={() => {
               sendGTMEvent({

@@ -5,17 +5,21 @@ import { config } from "@workspace/config";
 import { Toaster } from "@workspace/ui/components/sonner";
 import { ConvexProviderWithAuth, ConvexReactClient } from "convex/react";
 import { MotionConfig } from "framer-motion";
+import dynamic from "next/dynamic";
 import type { Session } from "next-auth";
 import { SessionProvider, useSession } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import { type ReactNode, useMemo } from "react";
-import { ThemeToggle } from "@/components/app/theme-toggle";
 
 if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
   throw new Error("env variable NEXT_PUBLIC_CONVEX_URL is missing");
 }
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL);
+
+const ThemeToggle = dynamic(() => import("@/components/app/theme-toggle"), {
+  ssr: false,
+});
 
 type ProvidersProps = {
   children: ReactNode;

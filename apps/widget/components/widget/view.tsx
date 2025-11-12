@@ -4,9 +4,12 @@ import { useAtomValue } from "jotai";
 import { screenAtom } from "@/components/widget/atoms";
 import WidgetAuthScreen from "@/components/widget/screens/auth";
 import WidgetChatScreen from "@/components/widget/screens/chat";
+import WidgetContactScreen from "@/components/widget/screens/contact";
 import WidgetErrorScreen from "@/components/widget/screens/error";
+import WidgetInboxScreen from "@/components/widget/screens/inbox";
 import WidgetLoadingScreen from "@/components/widget/screens/loading";
 import WidgetSelectionScreen from "@/components/widget/screens/selection";
+import WidgetVoiceScreen from "@/components/widget/screens/voice";
 import type { PropsWithOrganizationId, WidgetScreen } from "@/types/widget";
 
 export default function WidgetView({
@@ -19,14 +22,14 @@ export default function WidgetView({
     error: <WidgetErrorScreen />,
     auth: <WidgetAuthScreen />,
     selection: <WidgetSelectionScreen />,
-    voice: <div>Voice...</div>,
+    voice: <WidgetVoiceScreen />,
     chat: <WidgetChatScreen />,
-    inbox: <div>Inbox...</div>,
-    contact: <div>Contact...</div>,
+    inbox: <WidgetInboxScreen />,
+    contact: <WidgetContactScreen />,
   };
 
   return (
-    <main className="flex h-full w-full flex-col overflow-hidden rounded-xl border border-border bg-muted">
+    <main className="flex h-screen w-full flex-col overflow-hidden rounded-xl border border-border bg-muted">
       {screenComponent[screen]}
     </main>
   );

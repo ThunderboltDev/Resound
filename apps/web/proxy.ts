@@ -2,33 +2,44 @@ import { NextResponse } from "next/server";
 
 const AUTH_ROUTES = ["/auth", "/check-email"];
 
-const PUBLIC_ROUTES = [
-  "/",
-  "/faq",
-  "/test",
-  "/logout",
-  "/contact",
-  "/pricing",
-  "/cookie-policy",
-  "/privacy-policy",
-  "/terms-of-service",
-];
+const PRIVATE_ROUTES = ["/dashboard", "/account"];
 
 const sessionCookieRegex = /\b(?:__Secure-)?authjs\.session-token=/;
 
 export default function proxy(req: Request & { nextUrl: URL }) {
   const { pathname, searchParams } = req.nextUrl;
 
+  if (pathname === "/logout") {
+    const res = NextResponse.redirect(new URL("/", req.url));
+    res.cookies.set("__Secure-authjs.session-token", "", {
+      path: "/",
+      expires: new Date(0),
+    });
+    res.cookies.set("authjs.session-token", "", {
+      path: "/",
+      expires: new Date(0),
+    });
+    return res;
+  }
+
   const cookieHeader = req.headers.get("cookie") || "";
   const isAuthenticated = sessionCookieRegex.test(cookieHeader);
 
   const isAuthRoute = AUTH_ROUTES.includes(pathname);
-  const isPublicRoute =
-    PUBLIC_ROUTES.includes(pathname) ||
+
+  const isPrivateRoute = PRIVATE_ROUTES.some((route) =>
+    pathname.startsWith(route)
+  );
+
+  const isInternalRoute =
     pathname.startsWith("/api/auth") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/_next/static") ||
     pathname.startsWith("/_next/image");
+
+  if (isInternalRoute) {
+    return NextResponse.next();
+  }
 
   if (!isAuthenticated) {
     if (isAuthRoute) {
@@ -38,16 +49,14 @@ export default function proxy(req: Request & { nextUrl: URL }) {
       return res;
     }
 
-    if (isPublicRoute) {
-      return NextResponse.next();
+    if (isPrivateRoute) {
+      const redirectUrl = new URL("/auth", req.url);
+      redirectUrl.searchParams.set("origin", pathname);
+      return NextResponse.redirect(redirectUrl);
     }
-
-    const redirectUrl = new URL("/auth", req.url);
-    redirectUrl.searchParams.set("origin", pathname);
-    return NextResponse.redirect(redirectUrl);
   }
 
-  if (AUTH_ROUTES.includes(pathname)) {
+  if (isAuthRoute && isAuthenticated) {
     const origin = searchParams.get("origin");
 
     if (!origin || AUTH_ROUTES.includes(origin)) {

@@ -1,25 +1,31 @@
 "use client";
 
 import Vapi from "@vapi-ai/web";
+import { useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
+import { vapiSecretsAtom, widgetSettingsAtom } from "@/components/widget/atoms";
 
-// api keys used here are only for testing
-// customers will provider their own API keys
-
-type TranscrpitMessage = {
+type TranscriptMessage = {
   role: "user" | "assistant";
   text: string;
 };
 
-export default function useVapi() {
+export function useVapi() {
   const [vapi, setVapi] = useState<Vapi | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
-  const [transcript, setTranscript] = useState<TranscrpitMessage[]>([]);
+  const [transcript, setTranscript] = useState<TranscriptMessage[]>([]);
+
+  const vapiSecrets = useAtomValue(vapiSecretsAtom);
+  const widgetSettings = useAtomValue(widgetSettingsAtom);
 
   useEffect(() => {
-    const vapiInstance = new Vapi("57764966-128c-4852-9174-7f2724d427be");
+    if (!vapiSecrets) {
+      return;
+    }
+
+    const vapiInstance = new Vapi(vapiSecrets.public);
     setVapi(vapiInstance);
 
     vapiInstance.on("call-start", () => {
@@ -43,7 +49,7 @@ export default function useVapi() {
     });
 
     vapiInstance.on("error", (error) => {
-      console.log("Vapi error:", error);
+      console.error("Vapi error:", error);
       setIsConnecting(false);
     });
 
@@ -55,9 +61,9 @@ export default function useVapi() {
               ...prev,
               {
                 role: message.role === "user" ? "user" : "assistant",
-                message: message.transcript,
+                text: message.transcript,
               },
-            ] as TranscrpitMessage[]
+            ] as TranscriptMessage[]
         );
       }
     });
@@ -65,19 +71,23 @@ export default function useVapi() {
     return () => {
       vapiInstance.stop();
     };
-  }, []);
+  }, [vapiSecrets]);
 
-  const startCall = () => {
+  const startCall = async () => {
+    if (!vapiSecrets || !widgetSettings?.vapiSettings.assistantId) {
+      return;
+    }
+
     setIsConnecting(true);
 
     if (vapi) {
-      vapi.start("0cfc93d6-6eda-4b0e-94be-44e4c91b1792");
+      await vapi.start(widgetSettings.vapiSettings.assistantId);
     }
   };
 
-  const endCall = () => {
+  const endCall = async () => {
     if (vapi) {
-      vapi.stop();
+      await vapi.stop();
     }
   };
 

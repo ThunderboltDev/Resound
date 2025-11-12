@@ -25,7 +25,7 @@ import {
 import { usePathname } from "next/navigation";
 import { SelectOrganization } from "@/components/org/select";
 import { LinkButton } from "@/components/ui/link-button";
-import type { PropsWithOrganization } from "@/hoc/with-org";
+import { useOrganization } from "@/hoc/with-org";
 
 const customerSupportItems = [
   {
@@ -66,11 +66,10 @@ const accountItems = [
   },
 ];
 
-export default function DashboardSidebar({
-  organizations,
-  selectedOrganization,
-}: PropsWithOrganization) {
+export default function DashboardSidebar() {
   const pathname = usePathname();
+
+  const { organizations, selectedOrganization } = useOrganization();
 
   const isActive = (url: string) => {
     return pathname.startsWith(url);
@@ -81,12 +80,10 @@ export default function DashboardSidebar({
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <SelectOrganization
-                organizations={organizations}
-                selectedOrganization={selectedOrganization}
-              />
-            </SidebarMenuButton>
+            <SelectOrganization
+              organizations={organizations}
+              selectedOrganization={selectedOrganization}
+            />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
@@ -103,8 +100,8 @@ export default function DashboardSidebar({
                     tooltip={item.title}
                   >
                     <LinkButton
-                      className="justify-start"
-                      variant="ghost"
+                      variant={isActive(item.url) ? "default" : "transparent"}
+                      theme={isActive(item.url) ? "primary" : "default"}
                       href={item.url}
                     >
                       <item.icon />
@@ -128,8 +125,8 @@ export default function DashboardSidebar({
                     tooltip={item.title}
                   >
                     <LinkButton
-                      className="justify-start"
-                      variant="ghost"
+                      variant={isActive(item.url) ? "default" : "transparent"}
+                      theme={isActive(item.url) ? "primary" : "default"}
                       href={item.url}
                     >
                       <item.icon />
@@ -153,8 +150,8 @@ export default function DashboardSidebar({
                     tooltip={item.title}
                   >
                     <LinkButton
-                      className="justify-start"
-                      variant="ghost"
+                      variant={isActive(item.url) ? "default" : "transparent"}
+                      theme={isActive(item.url) ? "primary" : "default"}
                       href={item.url}
                     >
                       <item.icon />

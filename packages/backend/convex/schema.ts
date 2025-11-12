@@ -10,9 +10,6 @@ export const userSchema = {
 
   currentOrganizationId: v.optional(v.id("organizations")),
 
-  plan: v.union(v.literal("free"), v.literal("pro")),
-  currentEndPeriod: v.optional(v.number()),
-
   lastLogin: v.number(),
 };
 
@@ -71,6 +68,37 @@ export const memberSchema = {
   joinedAt: v.number(),
 };
 
+export const pluginSchema = {
+  organizationId: v.id("organizations"),
+  service: v.union(v.literal("vapi")),
+  keys: v.object({
+    public: v.optional(v.string()),
+    private: v.optional(v.string()),
+    extra: v.optional(v.any()),
+  }),
+};
+
+// Subscription Schema
+
+const subscriptionSchema = {
+  organizationId: v.id("organizations"),
+  subscriptionId: v.optional(v.string()),
+  customerId: v.optional(v.string()),
+  currentPeriodEnd: v.optional(v.number()),
+  planId: v.optional(
+    v.union(v.literal("basic"), v.literal("plus"), v.literal("Premium"))
+  ),
+  status: v.optional(
+    v.union(
+      v.literal("active"),
+      v.literal("canceled"),
+      v.literal("expired"),
+      v.literal("trialing"),
+      v.literal("past_due")
+    )
+  ),
+};
+
 // Widget Schema
 
 export const widgetSessionSchema = {
@@ -97,6 +125,16 @@ export const widgetSessionSchema = {
       currentUrl: v.optional(v.string()),
     })
   ),
+};
+
+export const widgetSettings = {
+  organizationId: v.id("organizations"),
+  greetingMessage: v.optional(v.string()),
+  defaultSuggestions: v.optional(v.array(v.string())),
+  vapiSettings: v.object({
+    assistantId: v.optional(v.string()),
+    phoneNumber: v.optional(v.string()),
+  }),
 };
 
 export const conversationSchema = {
@@ -132,12 +170,24 @@ const orgTables = {
     .index("by_user_org", ["userId", "organizationId"])
     .index("organizationId", ["organizationId"])
     .index("userId", ["userId"]),
+  plugins: defineTable(pluginSchema)
+    .index("by_organization_id", ["organizationId"])
+    .index("by_organization_and_service", ["organizationId", "service"]),
+};
+
+const subscriptionTables = {
+  subscriptions: defineTable(subscriptionSchema).index("organizationId", [
+    "organizationId",
+  ]),
 };
 
 const widgetTables = {
   widgetSessions: defineTable(widgetSessionSchema)
     .index("by_org_id", ["organizationId"])
     .index("by_expires_at", ["expiresAt"]),
+  widgetSettings: defineTable(widgetSettings).index("by_organization_id", [
+    "organizationId",
+  ]),
   conversations: defineTable(conversationSchema)
     .index("threadId", ["threadId"])
     .index("organizationId", ["organizationId"])
@@ -145,13 +195,9 @@ const widgetTables = {
     .index("by_status_and_org_id", ["status", "organizationId"]),
 };
 
-export default defineSchema(
-  {
-    ...authTables,
-    ...orgTables,
-    ...widgetTables,
-  },
-  {
-    schemaValidation: false,
-  }
-);
+export default defineSchema({
+  ...authTables,
+  ...orgTables,
+  ...subscriptionTables,
+  ...widgetTables,
+});

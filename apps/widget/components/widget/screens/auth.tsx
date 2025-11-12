@@ -15,7 +15,11 @@ import { useMutation } from "convex/react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { organizationIdAtom, widgetSessionIdAtomFamily } from "../atoms";
+import {
+  organizationIdAtom,
+  screenAtom,
+  widgetSessionIdAtomFamily,
+} from "../atoms";
 import WidgetHeader from "../header";
 
 const formSchema = z.object({
@@ -30,8 +34,9 @@ export default function WidgetAuthScreen() {
   const createSession = useMutation(api.widgetSession.create);
   const organizationId = useAtomValue(organizationIdAtom);
 
+  const setScreen = useSetAtom(screenAtom);
   const setWidgetSessionId = useSetAtom(
-    widgetSessionIdAtomFamily(organizationId)
+    widgetSessionIdAtomFamily(organizationId ?? "")
   );
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,9 +48,9 @@ export default function WidgetAuthScreen() {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    // if (!organizationId) {
-    //   return;
-    // }
+    if (!organizationId) {
+      return;
+    }
 
     const metadata: Doc<"widgetSessions">["metadata"] = {
       userAgent: navigator.userAgent,
@@ -73,6 +78,7 @@ export default function WidgetAuthScreen() {
     });
 
     setWidgetSessionId(widgetSessionId);
+    setScreen("selection");
   };
 
   return (

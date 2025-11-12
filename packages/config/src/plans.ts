@@ -1,42 +1,53 @@
 import { isDev } from "@workspace/config";
 
+type PlanId = "basic" | "plus" | "premium";
+
 export const plans = {
-  free: {
-    id: "free",
-    name: "Free",
+  basic: {
+    id: "basic",
+    name: "Basic",
     currency: "USD",
     price: {
       monthly: 0,
       yearly: 0,
     },
     productId: {
-      monthly: "free",
-      yearly: "free",
+      monthly: "basic",
+      yearly: "basc",
     },
-    maxFileSize: "4MB",
-    maxFileSizeInBytes: 4 * 1024 * 1024,
-    maxFiles: 5,
-    maxPages: 5,
   },
-  pro: {
-    id: "pro",
-    name: "Pro",
+  plus: {
+    id: "plus",
+    name: "Plus",
     currency: "USD",
     price: {
-      monthly: 9.99,
-      yearly: 99.99,
+      monthly: 29,
+      yearly: 290,
     },
     productId: {
-      monthly: isDev
-        ? "prod_4ZtlEyxvUyIIMxSraQ7ZcT"
-        : "prod_39PGhjrtoKxvMiRjyfkfct",
-      yearly: isDev
-        ? "prod_7G9AC88XkORnOM3vNiS3m4"
-        : "prod_2ucrc2OavaNR9bRPpbKcd3",
+      monthly: isDev ? "prod_6EczoSW4ZQSFl4pcz6GGGa" : "",
+      yearly: isDev ? "prod_tXQTtrM2yFZ5gpowv2ms2" : "",
     },
-    maxFileSize: "16MB",
-    maxFileSizeInBytes: 4 * 1024 * 1024,
-    maxFiles: 25,
-    maxPages: 25,
   },
-};
+  premium: {
+    id: "premium",
+    name: "Premium",
+    currency: "USD",
+    price: {
+      monthly: 99,
+      yearly: 990,
+    },
+    productId: {
+      monthly: isDev ? "prod_4G4UhU5o2Ojm9QvMudScHJ" : "",
+      yearly: isDev ? "prod_jIhMoTCF15dsvb6swrYQ8" : "",
+    },
+  },
+} as const;
+
+export const productIdToPlanId: Record<string, PlanId> = {
+  basic: "basic",
+  prod_6EczoSW4ZQSFl4pcz6GGGa: "plus",
+  prod_tXQTtrM2yFZ5gpowv2ms2: "plus",
+  prod_4G4UhU5o2Ojm9QvMudScHJ: "premium",
+  prod_jIhMoTCF15dsvb6swrYQ8: "premium",
+} as const;

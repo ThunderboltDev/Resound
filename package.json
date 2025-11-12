@@ -16,7 +16,12 @@
   },
   "pnpm": {
     "overrides": {
+      "@convex-dev/agent": "0.2.12",
+      "convex": "^1.28.2",
+      "convex-helpers": "^0.1.104",
       "@hookform/resolvers": "^5.2.2",
+      "import-in-the-middle": "^2.0.0",
+      "require-in-the-middle": "^8.0.1",
       "react": "19.2.0",
       "react-dom": "19.2.0",
       "@types/react": "19.1.9",

@@ -1,4 +1,4 @@
-import { Loader } from "@workspace/ui/components/loader";
+import { LoadingScreen } from "@workspace/ui/components/loading-screen";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -7,12 +7,12 @@ import Logout from "./logout";
 
 export const metadata: Metadata = {
   title: "Logout",
-  description: "Log out of your PDF Pal account safely and securely.",
+  description: "Log out of your Resound account safely and securely.",
   keywords: [
-    "PDF Pal logout",
-    "PDF Pal log out",
-    "PDF Pal signout",
-    "PDF Pal sign out",
+    "Resound logout",
+    "Resound log out",
+    "Resound signout",
+    "Resound sign out",
   ],
 };
 
@@ -24,7 +24,7 @@ export default async function LogoutWrapper() {
   }
 
   return (
-    <Suspense fallback={<Loader />}>
+    <Suspense fallback={<LoadingScreen />}>
       <Logout />
     </Suspense>
   );

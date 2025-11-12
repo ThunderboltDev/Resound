@@ -1,14 +1,21 @@
-import { cookies } from "next/headers";
+"use client";
+
+import { SidebarProvider } from "@workspace/ui/components/sidebar";
+import { Provider } from "jotai";
 import type { PropsWithChildren } from "react";
-import DashboardLayout from "@/components/layouts/dashboard";
+import DashboardSidebar from "@/app/(dashboard)/sidebar";
+import { withAuth } from "@/hoc/with-auth";
+import { withOrganization } from "@/hoc/with-org";
 
-export default async function DashboardLayoutPage({
-  children,
-}: PropsWithChildren) {
-  const cookieStore = await cookies();
-  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
-
+function DashboardLayout({ children }: PropsWithChildren) {
   return (
-    <DashboardLayout defaultOpen={defaultOpen}>{children}</DashboardLayout>
+    <SidebarProvider>
+      <DashboardSidebar />
+      <Provider>
+        <main className="w-full">{children}</main>
+      </Provider>
+    </SidebarProvider>
   );
 }
+
+export default withAuth(withOrganization(DashboardLayout));

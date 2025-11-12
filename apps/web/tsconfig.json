@@ -5,7 +5,10 @@
     "paths": {
       "@/*": ["./*"],
       "@workspace/ui/*": ["../../packages/ui/src/*"],
-      "@workspace/backend/*": ["../../packages/backend/convex/*"]
+      "@workspace/backend/*": ["../../packages/backend/convex/*"],
+      "@workspace/backend/_generated/*": [
+        "../../packages/backend/convex/_generated/*"
+      ]
     },
     "plugins": [
       {
@@ -19,7 +22,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "components/ui/sonner.tsx"
+    "components/ui/sonner.tsx",
+    "../../packages/ui/src/hooks/use-mobile.ts"
   ],
   "exclude": ["node_modules"]
 }

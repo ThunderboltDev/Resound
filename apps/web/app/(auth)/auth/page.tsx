@@ -1,4 +1,4 @@
-import { Loader } from "@workspace/ui/components/loader";
+import { LoadingScreen } from "@workspace/ui/components/loading-screen";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -32,7 +32,7 @@ export default async function AuthWrapper({ params }: AuthWrapperProps) {
   }
 
   return (
-    <Suspense fallback={<Loader />}>
+    <Suspense fallback={<LoadingScreen />}>
       <Auth />
     </Suspense>
   );

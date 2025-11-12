@@ -1,6 +1,6 @@
 import { api } from "@workspace/backend/_generated/api";
-import { Spinner } from "@workspace/ui/components/spinner";
-import { useMutation } from "convex/react";
+import { Loader } from "@workspace/ui/components/loader";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
 import {
@@ -8,7 +8,9 @@ import {
   loadingMessageAtom,
   organizationIdAtom,
   screenAtom,
+  vapiSecretsAtom,
   widgetSessionIdAtomFamily,
+  widgetSettingsAtom,
 } from "@/components/widget/atoms";
 import WidgetHeader from "@/components/widget/header";
 import type { PropsWithOrganizationId } from "@/types/widget";
@@ -25,11 +27,19 @@ export default function WidgetLoadingScreen({
 
   const setLoadingMessage = useSetAtom(loadingMessageAtom);
   const setOrganizationId = useSetAtom(organizationIdAtom);
+  const setWidgetSettings = useSetAtom(widgetSettingsAtom);
   const setErrorMessage = useSetAtom(errorMessageAtom);
+  const setVapiSecrets = useSetAtom(vapiSecretsAtom);
   const setScreen = useSetAtom(screenAtom);
 
   const validateOrganization = useMutation(api.organization.validate);
   const validateWidgetSession = useMutation(api.widgetSession.validate);
+
+  const widgetSettings = useQuery(api.widgetSettings.getByOrganizationId, {
+    organizationId: organizationId ?? "",
+  });
+
+  const getVapiSecrets = useAction(api.secret.getVapiSecrets);
 
   const widgetSessionId = useAtomValue(
     widgetSessionIdAtomFamily(organizationId ?? "")
@@ -82,7 +92,7 @@ export default function WidgetLoadingScreen({
 
     if (!widgetSessionId) {
       setIsSessionValid(false);
-      setStep("done");
+      setStep("settings");
       return;
     }
 
@@ -93,13 +103,41 @@ export default function WidgetLoadingScreen({
     })
       .then((result) => {
         setIsSessionValid(result?.isValid ?? false);
-        setStep("done");
+        setStep("settings");
       })
       .catch(() => {
         setIsSessionValid(false);
-        setStep("done");
+        setStep("settings");
       });
   }, [step, widgetSessionId, setLoadingMessage, validateWidgetSession]);
+
+  useEffect(() => {
+    if (step !== "settings") return;
+
+    setLoadingMessage("Loading settings...");
+
+    if (widgetSettings !== undefined) {
+      setWidgetSettings(widgetSettings);
+    }
+
+    setStep("vapi");
+  }, [step, widgetSettings, setLoadingMessage, setWidgetSettings]);
+
+  useEffect(() => {
+    if (step !== "vapi") return;
+
+    setLoadingMessage("Loading voice features...");
+
+    getVapiSecrets({ organizationId: organizationId ?? "" }).then(
+      (vapiSecrets) => {
+        setVapiSecrets({
+          public: vapiSecrets.public,
+        });
+      }
+    );
+
+    setStep("done");
+  }, [step, setLoadingMessage, setVapiSecrets, getVapiSecrets, organizationId]);
 
   useEffect(() => {
     if (step !== "done") {
@@ -120,7 +158,7 @@ export default function WidgetLoadingScreen({
         </div>
       </WidgetHeader>
       <div className="flex flex-col items-center justify-center gap-4 h-[calc(100%-8rem)]">
-        <Spinner className="size-12 text-primary" />
+        <Loader className="size-12 text-primary" />
         <p className="text-lg">{loadingMessage}</p>
       </div>
     </>

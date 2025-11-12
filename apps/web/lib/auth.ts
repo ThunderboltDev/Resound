@@ -1,6 +1,5 @@
 import { api } from "@workspace/backend/_generated/api";
 import type { Id } from "@workspace/backend/_generated/dataModel";
-import { isDev } from "@workspace/config";
 
 import axios from "axios";
 import { importPKCS8, SignJWT } from "jose";
@@ -41,7 +40,7 @@ type GeoResponse = {
 };
 
 const nextAuth = NextAuth({
-  debug: isDev,
+  debug: false,
   adapter: ConvexAdapter,
   providers: [
     Nodemailer({
@@ -49,14 +48,13 @@ const nextAuth = NextAuth({
       server: process.env.EMAIL_SERVER,
       from: process.env.EMAIL_FROM,
       async sendVerificationRequest({ identifier, url, provider }) {
-        const { host } = new URL(url);
         const transport = createTransport(provider.server);
 
         const result = await transport.sendMail({
           to: identifier,
           from: provider.from,
-          subject: `Verify your email: ${host}`,
-          text: text({ url, host }),
+          subject: `Verify your email: Resound`,
+          text: text(),
           html: html(url),
         });
 
@@ -99,7 +97,6 @@ const nextAuth = NextAuth({
             email: user.email,
             image: user.image ?? (profile?.image as string | undefined),
 
-            plan: "free",
             lastLogin: Date.now(),
           },
           secret,
@@ -242,35 +239,35 @@ const nextAuth = NextAuth({
 export const auth: NextAuthResult["auth"] = nextAuth.auth;
 export const handlers = nextAuth.handlers;
 
-function text({ url, host }: { url: string; host: string }) {
-  return `Verify your email: ${host}\n${url}\n\n`;
+function text() {
+  return "Resound: Verify your email";
 }
 
 function html(url: string) {
-  const brandColor = "#2b7fff";
+  const brandColor = "#4f39f6";
 
   const fontFamily = "Arial, Helvetica, sans-serif";
 
   const color = {
-    background: "#ffffff",
+    background: "#fafafa",
     text: "#101010",
-    secondaryText: "#404040",
+    secondaryText: "#202020",
     mutedText: "#707070",
-    buttonText: "#fafafa",
+    buttonText: "#f9f9f9",
     buttonBorder: brandColor,
     buttonBackground: brandColor,
   };
 
   return `
 <body style="background: ${color.background}; font-family: ${fontFamily};">
-  <table width="100%" border="0" cellspacing="20" cellpadding="0"
-    style="max-width: 600px; margin: auto; border-radius: 10px;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0"
+    style="max-width: 600px; margin: auto; border-radius: 10px;" role="presentation">
     <tr>
       <td 
         align="center"
-        style="padding: 10px 0px; font-size: 20px; color: ${color.text};"
+        style="padding: 10px 0px; font-size: 24px; color: ${color.text};"
       >
-        Verify your email!
+        Verify Your Email
       </td>
     </tr>
     <tr>
@@ -278,7 +275,7 @@ function html(url: string) {
         align="center"
         style="padding: 8px 0px; font-size: 16px; color: ${color.secondaryText};"
       >
-        Click the button below to verify your email
+        Click the button below to verify your email for <strong>Resound</strong>.
       </td>
     </tr>
     <tr>
@@ -298,9 +295,9 @@ function html(url: string) {
       </td>
     </tr>
     <tr>
-      <td align="center"
-        style="padding: 0px 0px 10px 0px; font-size: 12px; line-height: 16px; color: ${color.mutedText};">
-        If you did not request this email you can safely ignore it.
+      <td align="center" style="padding-top: 28px; font-size: 13px; color: ${color.mutedText}; line-height: 1.6;">
+        If you did not request this, you can safely ignore this message.<br/>
+        This link will expire shortly for your security.
       </td>
     </tr>
   </table>

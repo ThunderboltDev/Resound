@@ -7,16 +7,35 @@
     "lint": "pnpm exec biome check --write"
   },
   "exports": {
-    "./convex": "./convex/*.ts"
+    "./convex": {
+      "import": "./convex/index.ts",
+      "types": "./convex/_generated/api.d.ts"
+    },
+    "./_generated/*": "./convex/_generated/*"
+  },
+  "typesVersions": {
+    "*": {
+      "_generated/*": [
+        "convex/_generated/*"
+      ]
+    }
   },
   "devDependencies": {
     "@types/node": "^20.19.9",
     "@workspace/typescript-config": "workspace:*",
+    "@workspace/config": "workspace:*",
     "typescript": "latest"
   },
   "dependencies": {
+    "@ai-sdk/google": "^2.0.26",
+    "@convex-dev/agent": "^0.2.12",
+    "@convex-dev/rag": "^0.5.4",
+    "@vapi-ai/server-sdk": "^0.10.2",
+    "ai": "^5.0.86",
     "convex": "^1.28.0",
     "convex-helpers": "^0.1.104",
-    "jose": "^6.1.0"
+    "creem": "^0.4.0",
+    "jose": "^6.1.0",
+    "zod": "^4.1.12"
   }
 }

@@ -1,53 +1,60 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, internalQuery } from "./_generated/server";
 
-export const get = query({
+export const escalate = internalMutation({
   args: {
-    conversationId: v.id("conversations"),
-    widgetSessionId: v.id("widgetSessions"),
+    threadId: v.string(),
   },
-  handler: async (ctx, { conversationId, widgetSessionId }) => {
-    const widgetSession = await ctx.db.get(widgetSessionId);
+  handler: async (ctx, { threadId }) => {
+    const conversation = await ctx.db
+      .query("conversations")
+      .withIndex("threadId", (q) => q.eq("threadId", threadId))
+      .unique();
 
-    if (!widgetSession || widgetSession.expiresAt < Date.now()) {
+    if (!conversation) {
       throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Invalid session",
+        code: "NOT_FOUND",
+        message: "conversation not found",
       });
     }
 
-    const conversation = await ctx.db.get(conversationId);
-
-    if (conversation?.widgetSessionId === widgetSessionId) {
-      return conversation;
-    } else {
-      return null;
-    }
+    await ctx.db.patch(conversation._id, {
+      status: "escalated",
+    });
   },
 });
 
-export const create = mutation({
+export const resolve = internalMutation({
   args: {
-    organizationId: v.id("organizations"),
-    widgetSessionId: v.id("widgetSessions"),
+    threadId: v.string(),
   },
-  handler: async (ctx, { organizationId, widgetSessionId }) => {
-    const widgetSession = await ctx.db.get(widgetSessionId);
+  handler: async (ctx, { threadId }) => {
+    const conversation = await ctx.db
+      .query("conversations")
+      .withIndex("threadId", (q) => q.eq("threadId", threadId))
+      .unique();
 
-    if (!widgetSession || widgetSession.expiresAt < Date.now()) {
+    if (!conversation) {
       throw new ConvexError({
-        code: "UNAUTHORIZED",
-        message: "Invalid session",
+        code: "NOT_FOUND",
+        message: "conversation not found",
       });
     }
 
-    const conversationId = await ctx.db.insert("conversations", {
-      threadId: "",
-      widgetSessionId,
-      status: "unresolved",
-      organizationId: organizationId,
+    await ctx.db.patch(conversation._id, {
+      status: "resolved",
     });
+  },
+});
 
-    return conversationId;
+export const getByThreadId = internalQuery({
+  args: {
+    threadId: v.string(),
+  },
+  handler: async (ctx, { threadId }) => {
+    return await ctx.db
+      .query("conversations")
+      .withIndex("threadId", (q) => q.eq("threadId", threadId))
+      .unique();
   },
 });

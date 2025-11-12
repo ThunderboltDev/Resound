@@ -1,10 +1,14 @@
-import { Spinner } from "@workspace/ui/components/spinner";
+import { cn } from "@workspace/ui/lib/utils";
+import { Loader2Icon } from "lucide-react";
 
-function Loader({ ...props }: React.ComponentProps<typeof Spinner>) {
+function Loader({ className, ...props }: React.ComponentProps<"svg">) {
   return (
-    <div className="w-full h-screen grid place-items-center">
-      <Spinner className="text-info size-10" {...props} />
-    </div>
+    <Loader2Icon
+      role="status"
+      aria-label="Loading"
+      className={cn("size-4 animate-spin cursor-progress", className)}
+      {...props}
+    />
   );
 }
 
