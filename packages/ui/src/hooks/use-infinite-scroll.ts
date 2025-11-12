@@ -11,9 +11,8 @@ export function useInfiniteScroll({
   status,
   loadMore,
   loadSize = 10,
-  observerEnabled = true,
 }: UseInfiniteScrollProps) {
-  const topElementRef = useRef<HTMLDivElement>(null);
+  const infiniteScrollRef = useRef<HTMLDivElement>(null);
 
   const handleLoadMore = useCallback(() => {
     if (status === "CanLoadMore") {
@@ -22,8 +21,8 @@ export function useInfiniteScroll({
   }, [status, loadSize, loadMore]);
 
   useEffect(() => {
-    const topElement = topElementRef.current;
-    if (!(topElement && observerEnabled)) return;
+    const topElement = infiniteScrollRef.current;
+    if (!topElement) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -39,13 +38,11 @@ export function useInfiniteScroll({
     return () => {
       observer.disconnect();
     };
-  }, [handleLoadMore, observerEnabled]);
+  }, [handleLoadMore]);
 
   return {
-    topElementRef,
     handleLoadMore,
-    canLoadMore: status === "CanLoadMore",
-    isLoadingMore: status === "LoadingMore",
+    infiniteScrollRef,
     isLoadingFirstPage: status === "LoadingFirstPage",
     isExhausted: status === "Exhausted",
   };

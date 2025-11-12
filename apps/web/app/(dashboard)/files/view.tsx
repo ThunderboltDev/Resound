@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
-import { InfiniteScroll } from "@workspace/ui/components/infinite-scroll";
+import { InfiniteScrollRef } from "@workspace/ui/components/infinite-scroll";
 import {
   Table,
   TableBody,
@@ -164,7 +164,7 @@ export default function FileView() {
           </Table>
           {!isLoadingFirstPage && files.results.length > 0 && (
             <div className="border-t border-border">
-              <InfiniteScroll
+              <InfiniteScrollRef
                 canLoadMore={canLoadMore}
                 isLoadingMore={isLoadingMore}
                 onLoadMore={handleLoadMore}

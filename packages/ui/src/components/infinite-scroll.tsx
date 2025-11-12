@@ -1,45 +1,29 @@
-import { Button } from "@workspace/ui/components/button";
+import { Loader } from "@workspace/ui/components/loader";
 import { cn } from "@workspace/ui/lib/utils";
 import type { Ref } from "react";
 
 type InfiniteScrollProps = {
-  canLoadMore: boolean;
-  isLoadingMore: boolean;
-  onLoadMore: () => void;
-  loadMoreText?: string;
-  noMoreText?: string;
+  isExhausted: boolean;
+  exhaustedText?: string;
   className?: string;
-  ref?: Ref<HTMLDivElement>;
+  ref: Ref<HTMLDivElement>;
 };
 
-export function InfiniteScroll({
-  canLoadMore,
-  isLoadingMore,
-  onLoadMore,
-  loadMoreText = "Load More",
-  noMoreText = "No more items",
+export function InfiniteScrollRef({
+  exhaustedText = "No more items",
+  isExhausted,
   className,
   ref,
 }: InfiniteScrollProps) {
-  let text = loadMoreText;
-
-  if (isLoadingMore) {
-    text = "Loading...";
-  } else if (!canLoadMore) {
-    text = noMoreText;
-  }
-
   return (
-    <div ref={ref} className={cn("flex w-full justify-center py-2", className)}>
-      <Button
-        size="sm"
-        variant="ghost"
-        onClick={onLoadMore}
-        disabled={!canLoadMore || isLoadingMore}
-        aria-busy={isLoadingMore}
-      >
-        {text}
-      </Button>
+    <div
+      ref={ref}
+      className={cn(
+        "grid place-items-center text-muted-foreground px-2 py-3",
+        className
+      )}
+    >
+      {isExhausted ? exhaustedText : <Loader />}
     </div>
   );
 }

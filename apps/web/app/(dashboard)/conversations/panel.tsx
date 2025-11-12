@@ -3,7 +3,7 @@
 import { api } from "@workspace/backend/_generated/api";
 import { ConversationStatus } from "@workspace/ui/components/conversation-status";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
-import { InfiniteScroll } from "@workspace/ui/components/infinite-scroll";
+import { InfiniteScrollRef } from "@workspace/ui/components/infinite-scroll";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import {
   Select,
@@ -40,31 +40,26 @@ export function ConversationsPanel() {
     }
   );
 
-  const {
-    topElementRef,
-    handleLoadMore,
-    canLoadMore,
-    isLoadingFirstPage,
-    isLoadingMore,
-  } = useInfiniteScroll({
-    status: conversations.status,
-    loadMore: conversations.loadMore,
-    loadSize: 10,
-  });
+  const { infiniteScrollRef, isExhausted, isLoadingFirstPage } =
+    useInfiniteScroll({
+      loadMore: conversations.loadMore,
+      status: conversations.status,
+      loadSize: 10,
+    });
 
   return (
     <div className="flex h-full w-full flex-col bg-background text-foreground">
       <div className="flex flex-col gap-4 border-b border-border p-2">
         <Select
           defaultValue="all"
+          value={statusFilter}
           onValueChange={(value) =>
             setStatusFilter(
               value as "all" | "unresolved" | "escalated" | "resolved"
             )
           }
-          value={statusFilter}
         >
-          <SelectTrigger className="h-8 border-none px-1.5 shadow-none ring-0 hover:bg-primary hover:text-primary-foreground focus-visible:ring-0">
+          <SelectTrigger className="w-full border-none shadow-none ring-0 focus-visible:ring-0">
             <SelectValue placeholder="Filter" />
           </SelectTrigger>
           <SelectContent>
@@ -165,11 +160,10 @@ export function ConversationsPanel() {
                 </Link>
               );
             })}
-            <InfiniteScroll
-              canLoadMore={canLoadMore}
-              onLoadMore={handleLoadMore}
-              isLoadingMore={isLoadingMore}
-              ref={topElementRef}
+            <InfiniteScrollRef
+              exhaustedText="No more conversations"
+              isExhausted={isExhausted}
+              ref={infiniteScrollRef}
             />
           </div>
         </ScrollArea>

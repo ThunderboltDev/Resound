@@ -21,7 +21,7 @@ import { Response } from "@workspace/ui/ai/response";
 import { Button } from "@workspace/ui/components/button";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 import { Form, FormField } from "@workspace/ui/components/form";
-import { InfiniteScroll } from "@workspace/ui/components/infinite-scroll";
+import { InfiniteScrollRef } from "@workspace/ui/components/infinite-scroll";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { useAction, useMutation, useQuery } from "convex/react";
@@ -169,7 +169,7 @@ export default function ConversationsView({
       </header>
       <Conversation className="max-h-[calc(100vh-180px)]">
         <ConversationContent>
-          <InfiniteScroll
+          <InfiniteScrollRef
             canLoadMore={canLoadMore}
             isLoadingMore={isLoadingMore}
             onLoadMore={handleLoadMore}
