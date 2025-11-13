@@ -18,9 +18,9 @@ import { Suggestion, Suggestions } from "@workspace/ui/ai/suggestion";
 import { Button } from "@workspace/ui/components/button";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 import { Form, FormField } from "@workspace/ui/components/form";
-import { InfiniteScroll } from "@workspace/ui/components/infinite-scroll";
+import { InfiniteScrollRef } from "@workspace/ui/components/infinite-scroll-ref";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
-import { useAction, useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { ArrowLeft, Menu } from "lucide-react";
 import { useMemo } from "react";
@@ -65,17 +65,16 @@ export default function WidgetChatScreen() {
   }, [widgetSettings]);
 
   const conversation = useQuery(
-    api.conversation.get,
+    api.web.conversation.get,
     conversationId && widgetSessionId
       ? {
           conversationId,
-          widgetSessionId,
         }
       : "skip"
   );
 
   const messages = useThreadMessages(
-    api.messages.getMany,
+    api.web.messages.getMany,
     conversation?.threadId && widgetSessionId
       ? {
           threadId: conversation.threadId,
@@ -87,12 +86,11 @@ export default function WidgetChatScreen() {
     }
   );
 
-  const { topElementRef, handleLoadMore, isLoadingMore, canLoadMore } =
-    useInfiniteScroll({
-      status: messages.status,
-      loadMore: messages.loadMore,
-      loadSize: 10,
-    });
+  const { infiniteScrollRef, isExhausted } = useInfiniteScroll({
+    status: messages.status,
+    loadMore: messages.loadMore,
+    loadSize: 10,
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -101,7 +99,8 @@ export default function WidgetChatScreen() {
     },
   });
 
-  const createMessage = useAction(api.messages.create);
+  const createMessage = useMutation(api.web.message.create);
+
   const onBack = () => {
     setConversationId(null);
     setScreen("selection");
@@ -115,9 +114,8 @@ export default function WidgetChatScreen() {
     form.reset();
 
     await createMessage({
-      threadId: conversation.threadId,
-      prompt: values.message,
-      widgetSessionId,
+      conversationId: conversation._id,
+      message: values.message,
     });
   };
 
@@ -136,11 +134,9 @@ export default function WidgetChatScreen() {
       </WidgetHeader>
       <Conversation className="[&>*]:scrollbar-2 [&>*]:overflow-y-scroll">
         <ConversationContent>
-          <InfiniteScroll
-            canLoadMore={canLoadMore}
-            isLoadingMore={isLoadingMore}
-            onLoadMore={handleLoadMore}
-            ref={topElementRef}
+          <InfiniteScrollRef
+            isExhausted={isExhausted}
+            ref={infiniteScrollRef}
           />
           {toUIMessages(
             messages.results.filter((message) => !!message.text)
@@ -154,7 +150,6 @@ export default function WidgetChatScreen() {
                   <Response>{message.text}</Response>
                 </MessageContent>
                 {message.role !== "user" && (
-                  // TODO: placeholder logo
                   <DicebearAvatar
                     seed="assistant"
                     imageUrl="/logo.webp"
@@ -196,7 +191,7 @@ export default function WidgetChatScreen() {
               <PromptInputTextarea
                 {...field}
                 disabled={
-                  conversation?.status === "resvoled" ||
+                  conversation?.status === "resolved" ||
                   form.formState.isSubmitting
                 }
                 onKeyDown={(e) => {

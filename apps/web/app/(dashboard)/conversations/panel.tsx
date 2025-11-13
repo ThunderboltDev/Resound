@@ -3,7 +3,7 @@
 import { api } from "@workspace/backend/_generated/api";
 import { ConversationStatus } from "@workspace/ui/components/conversation-status";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
-import { InfiniteScrollRef } from "@workspace/ui/components/infinite-scroll";
+import { InfiniteScrollRef } from "@workspace/ui/components/infinite-scroll-ref";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import {
   Select,

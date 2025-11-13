@@ -2,7 +2,7 @@ import { Loader } from "@workspace/ui/components/loader";
 import { cn } from "@workspace/ui/lib/utils";
 import type { Ref } from "react";
 
-type InfiniteScrollProps = {
+type InfiniteScrollRefProps = {
   isExhausted: boolean;
   exhaustedText?: string;
   className?: string;
@@ -14,12 +14,12 @@ export function InfiniteScrollRef({
   isExhausted,
   className,
   ref,
-}: InfiniteScrollProps) {
+}: InfiniteScrollRefProps) {
   return (
     <div
       ref={ref}
       className={cn(
-        "grid place-items-center text-muted-foreground px-2 py-3",
+        "grid place-items-center text-center text-muted-foreground px-2 py-3",
         className
       )}
     >

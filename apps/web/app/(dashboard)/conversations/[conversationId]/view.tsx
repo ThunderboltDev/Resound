@@ -3,6 +3,7 @@
 import { toUIMessages, useThreadMessages } from "@convex-dev/agent/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@workspace/backend/_generated/api";
+import type { Id } from "@workspace/backend/_generated/dataModel";
 import {
   Conversation,
   ConversationContent,
@@ -21,7 +22,7 @@ import { Response } from "@workspace/ui/ai/response";
 import { Button } from "@workspace/ui/components/button";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 import { Form, FormField } from "@workspace/ui/components/form";
-import { InfiniteScrollRef } from "@workspace/ui/components/infinite-scroll";
+import { InfiniteScrollRef } from "@workspace/ui/components/infinite-scroll-ref";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { useAction, useMutation, useQuery } from "convex/react";
@@ -37,7 +38,7 @@ const formSchema = z.object({
 });
 
 type ConversationsViewProps = {
-  conversationId: string;
+  conversationId: Id<"conversations">;
 };
 
 export default function ConversationsView({
@@ -46,12 +47,12 @@ export default function ConversationsView({
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
   const [isEnhancing, setIsEnhancing] = useState<boolean>(false);
 
-  const conversation = useQuery(api.private.conversation.getOne, {
+  const conversation = useQuery(api.web.conversation.get, {
     conversationId,
   });
 
   const messages = useThreadMessages(
-    api.private.messages.getMany,
+    api.web.messages.getMany,
     conversation?.threadId
       ? {
           threadId: conversation.threadId,
@@ -62,17 +63,12 @@ export default function ConversationsView({
     }
   );
 
-  const {
-    topElementRef,
-    handleLoadMore,
-    canLoadMore,
-    isLoadingMore,
-    isLoadingFirstPage,
-  } = useInfiniteScroll({
-    status: messages.status,
-    loadMore: messages.loadMore,
-    loadSize: 10,
-  });
+  const { infiniteScrollRef, isExhausted, isLoadingFirstPage } =
+    useInfiniteScroll({
+      status: messages.status,
+      loadMore: messages.loadMore,
+      loadSize: 10,
+    });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -81,10 +77,10 @@ export default function ConversationsView({
     },
   });
 
-  const enhanceResponse = useAction(api.private.messages.enhanceResponse);
-  const createMessage = useMutation(api.private.messages.create);
+  const enhanceResponse = useAction(api.web.messages.enhanceResponse);
+  const createMessage = useMutation(api.web.messages.create);
   const updateConversationStatus = useMutation(
-    api.private.conversation.updateStatus
+    api.web.conversation.updateStatus
   );
 
   const handleEnhanceResponse = async () => {
@@ -110,7 +106,7 @@ export default function ConversationsView({
     }
 
     setIsUpdatingStatus(true);
-    let newStatus: string;
+    let newStatus: "unresolved" | "escalated" | "resolved" = "unresolved";
 
     if (conversation.status === "unresolved") {
       newStatus = "escalated";
@@ -170,10 +166,9 @@ export default function ConversationsView({
       <Conversation className="max-h-[calc(100vh-180px)]">
         <ConversationContent>
           <InfiniteScrollRef
-            canLoadMore={canLoadMore}
-            isLoadingMore={isLoadingMore}
-            onLoadMore={handleLoadMore}
-            ref={topElementRef}
+            isExhausted={isExhausted}
+            exhaustedText="No more messages"
+            ref={infiniteScrollRef}
           />
           {toUIMessages(
             messages.results.filter((message) => !!message.text)
@@ -205,12 +200,12 @@ export default function ConversationsView({
             <FormField
               name="message"
               control={form.control}
-              disabled={conversation?.status === "resvoled"}
+              disabled={conversation?.status === "resolved"}
               render={({ field }) => (
                 <PromptInputTextarea
                   {...field}
                   disabled={
-                    conversation?.status === "resvoled" ||
+                    conversation?.status === "resolved" ||
                     form.formState.isSubmitting ||
                     isEnhancing
                   }

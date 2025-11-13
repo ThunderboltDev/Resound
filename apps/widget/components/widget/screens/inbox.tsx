@@ -1,42 +1,31 @@
 import { api } from "@workspace/backend/_generated/api";
 import { Button } from "@workspace/ui/components/button";
 import { ConversationStatus } from "@workspace/ui/components/conversation-status";
-import { InfiniteScroll } from "@workspace/ui/components/infinite-scroll";
+import { InfiniteScrollRef } from "@workspace/ui/components/infinite-scroll-ref";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { usePaginatedQuery } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { ArrowLeft } from "lucide-react";
-import {
-  conversationIdAtom,
-  organizationIdAtom,
-  screenAtom,
-  widgetSessionIdAtomFamily,
-} from "@/components/widget/atoms";
+import { conversationIdAtom, screenAtom } from "@/components/widget/atoms";
 import WidgetFooter from "@/components/widget/footer";
 import WidgetHeader from "@/components/widget/header";
 
 export default function WidgetInboxScreen() {
-  const organizationId = useAtomValue(organizationIdAtom);
-  const widgetSessionId = useAtomValue(
-    widgetSessionIdAtomFamily(organizationId ?? "")
-  );
-
   const setScreen = useSetAtom(screenAtom);
   const setConversationId = useSetAtom(conversationIdAtom);
 
   const conversations = usePaginatedQuery(
-    api.conversation.getMany,
-    widgetSessionId ? { widgetSessionId } : "skip",
+    api.web.conversation.getMany,
+    {},
     { initialNumItems: 10 }
   );
 
-  const { topElementRef, handleLoadMore, isLoadingMore, canLoadMore } =
-    useInfiniteScroll({
-      status: conversations.status,
-      loadMore: conversations.loadMore,
-      loadSize: 10,
-    });
+  const { infiniteScrollRef, isExhausted } = useInfiniteScroll({
+    status: conversations.status,
+    loadMore: conversations.loadMore,
+    loadSize: 10,
+  });
 
   return (
     <>
@@ -79,11 +68,10 @@ export default function WidgetInboxScreen() {
               </div>
             </Button>
           ))}
-        <InfiniteScroll
-          canLoadMore={canLoadMore}
-          isLoadingMore={isLoadingMore}
-          onLoadMore={handleLoadMore}
-          ref={topElementRef}
+        <InfiniteScrollRef
+          isExhausted={isExhausted}
+          exhaustedText="No more items"
+          ref={infiniteScrollRef}
         />
       </div>
       <WidgetFooter />

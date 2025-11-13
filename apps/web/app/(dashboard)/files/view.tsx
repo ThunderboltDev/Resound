@@ -10,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
-import { InfiniteScrollRef } from "@workspace/ui/components/infinite-scroll";
+import { InfiniteScrollRef } from "@workspace/ui/components/infinite-scroll-ref";
 import {
   Table,
   TableBody,
@@ -39,17 +39,12 @@ export default function FileView() {
     }
   );
 
-  const {
-    topElementRef,
-    handleLoadMore,
-    canLoadMore,
-    isLoadingFirstPage,
-    isLoadingMore,
-  } = useInfiniteScroll({
-    status: files.status,
-    loadMore: files.loadMore,
-    loadSize: 10,
-  });
+  const { infiniteScrollRef, isExhausted, isLoadingFirstPage } =
+    useInfiniteScroll({
+      status: files.status,
+      loadMore: files.loadMore,
+      loadSize: 10,
+    });
 
   const handleDeleteFile = (file: File) => {
     setSelectedFile(file);
@@ -165,10 +160,9 @@ export default function FileView() {
           {!isLoadingFirstPage && files.results.length > 0 && (
             <div className="border-t border-border">
               <InfiniteScrollRef
-                canLoadMore={canLoadMore}
-                isLoadingMore={isLoadingMore}
-                onLoadMore={handleLoadMore}
-                ref={topElementRef}
+                isExhausted={isExhausted}
+                exhaustedText="No more files"
+                ref={infiniteScrollRef}
               />
             </div>
           )}
