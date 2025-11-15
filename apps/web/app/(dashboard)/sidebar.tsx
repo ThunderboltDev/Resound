@@ -15,6 +15,7 @@ import {
 } from "@workspace/ui/components/sidebar";
 import {
   CreditCard,
+  Globe,
   Inbox,
   LayoutDashboard,
   Library,
@@ -34,8 +35,13 @@ const customerSupportItems = [
     icon: Inbox,
   },
   {
+    title: "Websites",
+    url: "/websites",
+    icon: Globe,
+  },
+  {
     title: "Knowledge Base",
-    url: "/files",
+    url: "/knowledge-base",
     icon: Library,
   },
 ];

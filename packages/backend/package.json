@@ -22,8 +22,9 @@
   },
   "devDependencies": {
     "@types/node": "^20.19.9",
-    "@workspace/typescript-config": "workspace:*",
+    "@types/turndown": "^5.0.6",
     "@workspace/config": "workspace:*",
+    "@workspace/typescript-config": "workspace:*",
     "typescript": "latest"
   },
   "dependencies": {
@@ -32,10 +33,12 @@
     "@convex-dev/rag": "^0.5.4",
     "@vapi-ai/server-sdk": "^0.10.2",
     "ai": "^5.0.86",
+    "cheerio": "^1.1.2",
     "convex": "^1.28.0",
     "convex-helpers": "^0.1.104",
     "creem": "^0.4.0",
     "jose": "^6.1.0",
+    "turndown": "^7.2.2",
     "zod": "^4.1.12"
   }
 }

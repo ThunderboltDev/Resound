@@ -1,25 +1,20 @@
 "use client";
 
 import { api } from "@workspace/backend/_generated/api";
-import { Spinner } from "@workspace/ui/components/spinner";
+import { LoadingScreen } from "@workspace/ui/components/loading-screen";
 import { useQuery } from "convex/react";
 import { CustomizationForm } from "./customization-form";
 
 export function ViewCustomizationPage() {
-  const widgetSettings = useQuery(api.private.widgetSetting.get);
-  const vapiPlugin = useQuery(api.private.plugin.get, {
+  const widgetSettings = useQuery(api.web.widgetSetting.get);
+  const vapiPlugin = useQuery(api.web.plugin.get, {
     service: "vapi",
   });
 
   const isLoading = widgetSettings === undefined || vapiPlugin === undefined;
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-y-2 p-8">
-        <Spinner />
-        <p>Loading Widget Settings...</p>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (

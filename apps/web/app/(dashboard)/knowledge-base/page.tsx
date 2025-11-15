@@ -1,6 +1,6 @@
 "use client";
 
-import FileView from "@/app/(dashboard)/files/view";
+import FileView from "@/app/(dashboard)/knowledge-base/view";
 import { Protect } from "@/components/ui/protect";
 
 export default function Page() {

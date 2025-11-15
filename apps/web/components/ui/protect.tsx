@@ -12,7 +12,7 @@ type ProtectProps = {
 };
 
 export function Protect({ requiredPlan = "basic", children }: ProtectProps) {
-  const subscription = useQuery(api.subscription.get);
+  const subscription = useQuery(api.web.subscription.get);
 
   if (subscription === undefined) {
     return (

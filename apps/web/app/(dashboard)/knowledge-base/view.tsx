@@ -23,8 +23,8 @@ import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { usePaginatedQuery } from "convex/react";
 import { File as FileIcon, MoreHorizontal, Plus, Trash } from "lucide-react";
 import { useState } from "react";
-import UploadDialog from "@/app/(dashboard)/files/upload-dialog";
-import DeleteFileDialog from "@/components/ui/delete-file-dialog";
+import DeleteFileDialog from "@/app/(dashboard)/knowledge-base/delete-file-dialog";
+import UploadDialog from "@/app/(dashboard)/knowledge-base/upload-dialog";
 
 export default function FileView() {
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState<boolean>(false);

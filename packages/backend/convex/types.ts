@@ -13,9 +13,17 @@ export type File = {
   category?: string;
 };
 
-export type EntryMetadata = {
-  storageId: Id<"_storage">;
+export type Metadata={
   organizationId: Id<"organizations">;
-  fileName: string;
+  title: string;
   category?: string;
+}
+
+export type FileEntryMetadata = Metadata & {
+  storageId: Id<"_storage">;
+  fileName: string;
+};
+
+export type PageEntryMetadata = Metadata & {
+  
 };

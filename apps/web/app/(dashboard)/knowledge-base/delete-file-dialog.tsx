@@ -14,12 +14,12 @@ import {
 import { useMutation } from "convex/react";
 import { useState } from "react";
 
-type DeleteFileDialogProps = {
+interface DeleteFileDialogProps {
   open: boolean;
   file: File | null;
   onOpenChange: (open: boolean) => void;
   onDelete?: () => void;
-};
+}
 
 export default function DeleteFileDialog({
   open,
@@ -27,7 +27,7 @@ export default function DeleteFileDialog({
   onOpenChange,
   onDelete,
 }: DeleteFileDialogProps) {
-  const deleteFile = useMutation(api.private.file.remove);
+  const deleteFile = useMutation(api.web.file.remove);
 
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
 

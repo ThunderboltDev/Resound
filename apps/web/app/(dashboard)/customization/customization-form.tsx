@@ -56,7 +56,7 @@ export function CustomizationForm({
   initialData,
   hasVapiPlugin,
 }: CustomizationFormProps) {
-  const updateWidgetSettings = useMutation(api.private.widgetSetting.update);
+  const updateWidgetSettings = useMutation(api.web.widgetSetting.update);
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(customizationFormSchema),
@@ -78,7 +78,8 @@ export function CustomizationForm({
       const cleaned = {
         greetingMessage: values.greetingMessage?.trim() || undefined,
         defaultSuggestions:
-          values.defaultSuggestions?.filter(Boolean) || undefined,
+          values.defaultSuggestions?.filter((d) => d !== undefined) ||
+          undefined,
         vapiSettings: {
           assistantId:
             values.vapiSettings.assistantId &&
@@ -141,25 +142,27 @@ export function CustomizationForm({
                   Quick reply suggestions shown to users when they open the chat
                 </p>
                 <div className="space-y-4">
-                  {form.getValues("defaultSuggestions").map((_, index) => (
-                    <FormField
-                      key={crypto.randomUUID()}
-                      control={form.control}
-                      name={`defaultSuggestions.${index}` as const}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Suggestion {index + 1}</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder={`Suggestion ${index + 1}`}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormError />
-                        </FormItem>
-                      )}
-                    />
-                  ))}
+                  {(form.getValues("defaultSuggestions") ?? ["", "", ""]).map(
+                    (_, index) => (
+                      <FormField
+                        key={crypto.randomUUID()}
+                        control={form.control}
+                        name={`defaultSuggestions.${index}` as const}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Suggestion {index + 1}</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder={`Suggestion ${index + 1}`}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormError />
+                          </FormItem>
+                        )}
+                      />
+                    )
+                  )}
                 </div>
               </div>
             </div>
@@ -183,7 +186,8 @@ export function CustomizationForm({
         <div className="flex justify-end">
           <Button
             type="submit"
-            variant="primary"
+            theme="primary"
+            variant="default"
             disabled={form.formState.isSubmitting}
           >
             Save Settings

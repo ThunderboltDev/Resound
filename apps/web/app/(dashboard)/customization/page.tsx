@@ -3,7 +3,7 @@ import { ViewCustomizationPage } from "./view";
 
 export default function Page() {
   return (
-    <Protect requiredPlan="plus">
+    <Protect requiredPlan="basic">
       <ViewCustomizationPage />
     </Protect>
   );

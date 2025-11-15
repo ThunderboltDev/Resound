@@ -1,3 +1,4 @@
+import { vEntryId } from "@convex-dev/rag";
 import { defineSchema, defineTable } from "convex/server";
 import { type Validator, v } from "convex/values";
 
@@ -68,16 +69,6 @@ export const memberSchema = {
   joinedAt: v.number(),
 };
 
-export const pluginSchema = {
-  organizationId: v.id("organizations"),
-  service: v.union(v.literal("vapi")),
-  keys: v.object({
-    public: v.optional(v.string()),
-    private: v.optional(v.string()),
-    extra: v.optional(v.any()),
-  }),
-};
-
 // Subscription Schema
 
 const subscriptionSchema = {
@@ -97,6 +88,52 @@ const subscriptionSchema = {
       v.literal("past_due")
     )
   ),
+};
+
+// Main Features
+
+export const conversationSchema = {
+  threadId: v.string(),
+  organizationId: v.id("organizations"),
+  widgetSessionId: v.id("widgetSessions"),
+  status: v.union(
+    v.literal("unresolved"),
+    v.literal("escalated"),
+    v.literal("resolved")
+  ),
+};
+
+export const pluginSchema = {
+  organizationId: v.id("organizations"),
+  service: v.union(v.literal("vapi")),
+  keys: v.object({
+    public: v.optional(v.string()),
+    private: v.optional(v.string()),
+    extra: v.optional(v.any()),
+  }),
+};
+
+export const websiteSchema = {
+  url: v.string(),
+  organizationId: v.id("organizations"),
+  status: v.union(
+    v.literal("unverified"),
+    v.literal("verified"),
+    v.literal("failed")
+  ),
+  verificationMethod: v.optional(
+    v.union(v.literal("meta-tag"), v.literal("html-file"))
+  ),
+  verificationToken: v.string(),
+  verifiedAt: v.optional(v.number()),
+  reason: v.optional(v.string()),
+};
+
+export const pageSchema = {
+  websiteId: v.id("websites"),
+  entryId: vEntryId,
+  title: v.string(),
+  path: v.string(),
 };
 
 // Widget Schema
@@ -137,16 +174,7 @@ export const widgetSettings = {
   }),
 };
 
-export const conversationSchema = {
-  threadId: v.string(),
-  organizationId: v.id("organizations"),
-  widgetSessionId: v.id("widgetSessions"),
-  status: v.union(
-    v.literal("unresolved"),
-    v.literal("escalated"),
-    v.literal("resolved")
-  ),
-};
+// Tables
 
 const authTables = {
   users: defineTable(userSchema).index("email", ["email"]),
@@ -170,9 +198,21 @@ const orgTables = {
     .index("by_user_org", ["userId", "organizationId"])
     .index("organizationId", ["organizationId"])
     .index("userId", ["userId"]),
+};
+
+const mainFeaturesTables = {
+  conversations: defineTable(conversationSchema)
+    .index("threadId", ["threadId"])
+    .index("organizationId", ["organizationId"])
+    .index("widgetSessionId", ["widgetSessionId"])
+    .index("by_status_and_org_id", ["status", "organizationId"]),
   plugins: defineTable(pluginSchema)
     .index("by_organization_id", ["organizationId"])
     .index("by_organization_and_service", ["organizationId", "service"]),
+  websites: defineTable(websiteSchema)
+    .index("organizationId", ["organizationId"])
+    .index("status", ["status"]),
+  pages: defineTable(pageSchema).index("by_website_id", ["websiteId"]),
 };
 
 const subscriptionTables = {
@@ -188,11 +228,6 @@ const widgetTables = {
   widgetSettings: defineTable(widgetSettings).index("by_organization_id", [
     "organizationId",
   ]),
-  conversations: defineTable(conversationSchema)
-    .index("threadId", ["threadId"])
-    .index("organizationId", ["organizationId"])
-    .index("widgetSessionId", ["widgetSessionId"])
-    .index("by_status_and_org_id", ["status", "organizationId"]),
 };
 
 export default defineSchema({
@@ -200,4 +235,5 @@ export default defineSchema({
   ...orgTables,
   ...subscriptionTables,
   ...widgetTables,
+  ...mainFeaturesTables,
 });

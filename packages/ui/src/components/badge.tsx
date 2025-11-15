@@ -4,23 +4,28 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 
 const badgeVariants = cva(
-  "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden whitespace-nowrap rounded-sm border px-2 py-0.5 font-medium text-xs transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-danger aria-invalid:ring-danger/20 dark:aria-invalid:ring-danger/40 [&>svg]:pointer-events-none [&>svg]:size-3",
+  "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden whitespace-nowrap rounded-sm border font-medium transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-danger aria-invalid:ring-danger/20 [&>svg]:pointer-events-none",
   {
     variants: {
       variant: {
         primary: "border-0 bg-primary text-primary-foreground",
+        success: "border-0 bg-success text-white",
+        warning: "border-0 bg-warning text-white",
+        danger: "border-0 bg-danger text-white",
         gradient:
           "border-0 bg-linear-30 from-primary to-ksy-500 text-primary-foreground",
         secondary:
           "border-0 bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
-        danger:
-          "border-0 bg-danger text-white focus-visible:ring-danger/20 dark:bg-danger/60 dark:focus-visible:ring-danger/40 [a&]:hover:bg-danger/90",
         outline:
           "text-foreground [a&]:hover:bg-primary [a&]:hover:text-primary-foreground",
+      },
+      size: {
+        default: "px-2 py-0.5 text-sm [&>svg]:size-3.5",
       },
     },
     defaultVariants: {
       variant: "primary",
+      size: "default",
     },
   }
 );
@@ -28,6 +33,7 @@ const badgeVariants = cva(
 function Badge({
   className,
   variant,
+  size,
   asChild = false,
   ...props
 }: React.ComponentProps<"span"> &
@@ -36,7 +42,7 @@ function Badge({
 
   return (
     <Comp
-      className={cn(badgeVariants({ variant }), className)}
+      className={cn(badgeVariants({ variant, size }), className)}
       data-slot="badge"
       {...props}
     />

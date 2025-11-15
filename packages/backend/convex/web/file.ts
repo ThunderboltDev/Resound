@@ -9,7 +9,7 @@ import { paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import rag from "@/ai/rag";
 import { extractTextContent } from "@/lib/extractTextContent";
-import type { EntryMetadata, File } from "@/types";
+import type { File, FileEntryMetadata } from "@/types";
 import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import { action, mutation, type QueryCtx, query } from "../_generated/server";
@@ -78,11 +78,12 @@ export const add = action({
       title: fileName,
       metadata: {
         fileName,
+        title: fileName,
         storageId,
         organizationId,
         userId: user._id,
         category: category ?? null,
-      } as EntryMetadata,
+      } as FileEntryMetadata,
       contentHash: await contentHashFromArrayBuffer(bytes),
     });
 
@@ -247,7 +248,7 @@ export const list = query({
 });
 
 async function convertEntryToFile(ctx: QueryCtx, entry: Entry): Promise<File> {
-  const { storageId, fileName, category } = entry.metadata as EntryMetadata;
+  const { storageId, fileName, category } = entry.metadata as FileEntryMetadata;
 
   const storageMetadata = await ctx.db.system.get(storageId);
 

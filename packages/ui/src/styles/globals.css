@@ -134,7 +134,7 @@
   }
 
   h5 {
-    @apply leading-[1.4] text-lg;
+    @apply leading-[1.4] text-lg mb-1;
   }
 
   h6 {
@@ -222,7 +222,7 @@
 }
 
 @utility wrapper-* {
-  @apply mx-auto w-[calc(100vw-1.8rem)] xs:w-[calc(100vw-3rem)] md:w-[calc(100vw-4rem)];
+  @apply mx-auto w-[calc(100%-1.8rem)] xs:w-[calc(100%-3rem)] md:w-[calc(100%-4rem)];
   max-width: --value(--wrapper- *, integer);
 }
 
