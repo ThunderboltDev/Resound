@@ -295,6 +295,7 @@ export const verify = action({
       websiteId,
       status: "verified",
       verifiedAt: Date.now(),
+      verificationMethod,
     });
 
     return {

@@ -64,9 +64,9 @@ function useAuth() {
         forceRefreshToken: boolean;
       }) => {
         if (forceRefreshToken) {
-          const session = await update();
+          const newSession = await update();
 
-          return convexTokenFromSession(session);
+          return convexTokenFromSession(newSession);
         }
         return convexToken;
       },

@@ -31,7 +31,7 @@ const formSchema = z.object({
 });
 
 export default function WidgetAuthScreen() {
-  const createSession = useMutation(api.widgetSession.create);
+  const createSession = useMutation(api.widget.widgetSession.create);
   const organizationId = useAtomValue(organizationIdAtom);
 
   const setScreen = useSetAtom(screenAtom);
@@ -132,7 +132,8 @@ export default function WidgetAuthScreen() {
             )}
           />
           <Button
-            variant="primary"
+            variant="default"
+            theme="primary"
             type="submit"
             disabled={form.formState.isSubmitting}
           >

@@ -32,14 +32,19 @@ export default function WidgetLoadingScreen({
   const setVapiSecrets = useSetAtom(vapiSecretsAtom);
   const setScreen = useSetAtom(screenAtom);
 
-  const validateOrganization = useMutation(api.organization.validate);
-  const validateWidgetSession = useMutation(api.widgetSession.validate);
+  const validateOrganization = useMutation(api.widget.organization.validate);
+  const validateWidgetSession = useMutation(api.widget.widgetSession.validate);
 
-  const widgetSettings = useQuery(api.widgetSettings.getByOrganizationId, {
-    organizationId: organizationId ?? "",
-  });
+  const widgetSettings = useQuery(
+    api.widget.widgetSettings.getByOrganizationId,
+    organizationId
+      ? {
+          organizationId: organizationId,
+        }
+      : "skip"
+  );
 
-  const getVapiSecrets = useAction(api.secret.getVapiSecrets);
+  const getVapiSecrets = useAction(api.widget.secret.getVapi);
 
   const widgetSessionId = useAtomValue(
     widgetSessionIdAtomFamily(organizationId ?? "")
@@ -128,16 +133,29 @@ export default function WidgetLoadingScreen({
 
     setLoadingMessage("Loading voice features...");
 
-    getVapiSecrets({ organizationId: organizationId ?? "" }).then(
-      (vapiSecrets) => {
-        setVapiSecrets({
-          public: vapiSecrets.public,
-        });
-      }
-    );
+    if (!organizationId) {
+      setErrorMessage("Unable to verify organization!");
+      setScreen("error");
+      return;
+    }
+
+    getVapiSecrets({ organizationId }).then((vapiSecrets) => {
+      if (!vapiSecrets) return;
+      setVapiSecrets({
+        public: vapiSecrets.public,
+      });
+    });
 
     setStep("done");
-  }, [step, setLoadingMessage, setVapiSecrets, getVapiSecrets, organizationId]);
+  }, [
+    step,
+    setLoadingMessage,
+    setVapiSecrets,
+    getVapiSecrets,
+    organizationId,
+    setErrorMessage,
+    setScreen,
+  ]);
 
   useEffect(() => {
     if (step !== "done") {

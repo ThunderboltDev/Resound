@@ -36,12 +36,9 @@ export function ContactPanel() {
   const params = useParams();
   const conversationId = params.conversationId as string;
 
-  const widgetSession = useQuery(
-    api.private.widgetSession.getByConversationId,
-    {
-      conversationId: conversationId as Id<"conversations">,
-    }
-  );
+  const widgetSession = useQuery(api.web.widgetSession.getByConversationId, {
+    conversationId: conversationId as Id<"conversations">,
+  });
 
   const parseUserAgent = useMemo(() => {
     return (userAgent?: string) => {
@@ -101,22 +98,6 @@ export function ContactPanel() {
               userAgentInfo.deviceModel && ` - ${userAgentInfo.deviceModel}`
             } `,
             className: "capitalize",
-          },
-          {
-            label: "Screen Resolution",
-            value:
-              widgetSession.metadata.screenWidth &&
-              widgetSession.metadata.screenHeight
-                ? `${widgetSession.metadata.screenWidth} x ${widgetSession.metadata.screenHeight}`
-                : "Unknown",
-          },
-          {
-            label: "Viewport",
-            value:
-              widgetSession.metadata.viewportWidth &&
-              widgetSession.metadata.viewportHeight
-                ? `${widgetSession.metadata.viewportWidth} x ${widgetSession.metadata.viewportHeight}`
-                : "Unknown",
           },
           {
             label: "Cookies",
@@ -193,7 +174,7 @@ export function ContactPanel() {
             </p>
           </div>
         </div>
-        <Button className="w-full" variant="primary" asChild>
+        <Button className="w-full" theme="primary" asChild>
           <Link href={`mailto:${widgetSession.email}`}>
             <Mail />
             <span>Send Email</span>{" "}

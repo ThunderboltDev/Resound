@@ -147,7 +147,7 @@ export function VerificationSection({
               <SyntaxHighlighter
                 language="html"
                 style={atomOneDark}
-                className="scrollbar-1.5 rounded-md"
+                className="scrollbar-1.5 rounded-md !px-3"
               >
                 {codeExample}
               </SyntaxHighlighter>

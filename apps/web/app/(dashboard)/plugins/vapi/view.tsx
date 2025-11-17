@@ -60,7 +60,7 @@ const formSchema = z.object({
 });
 
 export default function VapiView() {
-  const vapiPlugin = useQuery(api.private.plugin.get, {
+  const vapiPlugin = useQuery(api.web.plugin.get, {
     service: "vapi",
   });
 
@@ -114,7 +114,7 @@ function VapiPluginForm({
   open: boolean;
   setOpen: (value: boolean) => void;
 }) {
-  const addSecret = useMutation(api.private.secret.add);
+  const addSecret = useMutation(api.web.secret.add);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -218,7 +218,7 @@ function VapiPluginRemoveForm({
   open: boolean;
   setOpen: (value: boolean) => void;
 }) {
-  const removePlugin = useMutation(api.private.plugin.remove);
+  const removePlugin = useMutation(api.web.plugin.remove);
 
   const onSubmit = async () => {
     try {
@@ -246,7 +246,7 @@ function VapiPluginRemoveForm({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button onClick={onSubmit} variant="danger">
+          <Button onClick={onSubmit} theme="danger">
             Disconnect
           </Button>
         </DialogFooter>

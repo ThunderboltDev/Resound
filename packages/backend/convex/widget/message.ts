@@ -1,4 +1,5 @@
-import { paginationOptsValidator } from "convex/server";
+import type { MessageDoc } from "@convex-dev/agent";
+import { type PaginationResult, paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import { supportAgent } from "@/ai/support";
 import { escalateConversation } from "@/ai/tools/escalateConversation";
@@ -86,9 +87,9 @@ export const getMany = query({
       });
     }
 
-    return await supportAgent.listMessages(ctx, {
+    return (await supportAgent.listMessages(ctx, {
       threadId,
       paginationOpts,
-    });
+    })) as PaginationResult<MessageDoc>;
   },
 });

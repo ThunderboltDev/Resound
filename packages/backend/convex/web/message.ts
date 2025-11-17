@@ -1,7 +1,7 @@
 import { google } from "@ai-sdk/google";
-import { saveMessage } from "@convex-dev/agent";
+import { type MessageDoc, saveMessage } from "@convex-dev/agent";
 import { generateText } from "ai";
-import { paginationOptsValidator } from "convex/server";
+import { type PaginationResult, paginationOptsValidator } from "convex/server";
 import { ConvexError, v } from "convex/values";
 import { supportAgent } from "@/ai/support";
 import { OPERATOR_MESSAGE_ENHANCEMENT_PROMPT } from "@/lib/prompts";
@@ -163,9 +163,9 @@ export const getMany = query({
       });
     }
 
-    return await supportAgent.listMessages(ctx, {
+    return (await supportAgent.listMessages(ctx, {
       threadId,
       paginationOpts,
-    });
+    })) as PaginationResult<MessageDoc>;
   },
 });

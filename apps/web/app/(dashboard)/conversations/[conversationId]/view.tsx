@@ -52,7 +52,7 @@ export default function ConversationsView({
   });
 
   const messages = useThreadMessages(
-    api.web.messages.getMany,
+    api.web.message.getMany,
     conversation?.threadId
       ? {
           threadId: conversation.threadId,

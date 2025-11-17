@@ -167,27 +167,6 @@ export const select = mutation({
   },
 });
 
-export const validate = mutation({
-  args: {
-    organizationId: v.id("organizations"),
-  },
-  handler: async (ctx, { organizationId }) => {
-    const organization = await ctx.db.get(organizationId);
-
-    if (!organization) {
-      return {
-        isValid: false,
-        reason: "Organization not found!",
-      };
-    }
-
-    return {
-      isValid: true,
-      organization,
-    };
-  },
-});
-
 export const validateSlug = query({
   args: { slug: v.string() },
   handler: async (ctx, { slug }) => {

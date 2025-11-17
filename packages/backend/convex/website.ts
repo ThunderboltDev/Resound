@@ -34,12 +34,19 @@ export const updateStatus = internalMutation({
       v.literal("failed")
     ),
     verifiedAt: v.optional(v.number()),
+    verificationMethod: v.optional(
+      v.union(v.literal("meta-tag"), v.literal("html-file"))
+    ),
   },
-  handler: async (ctx, { websiteId, status, reason, verifiedAt }) => {
+  handler: async (
+    ctx,
+    { websiteId, status, reason, verifiedAt, verificationMethod }
+  ) => {
     return await ctx.db.patch(websiteId, {
       status,
       reason,
       verifiedAt,
+      verificationMethod,
     });
   },
 });

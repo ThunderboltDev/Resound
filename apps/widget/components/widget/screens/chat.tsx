@@ -20,7 +20,7 @@ import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 import { Form, FormField } from "@workspace/ui/components/form";
 import { InfiniteScrollRef } from "@workspace/ui/components/infinite-scroll-ref";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
-import { useMutation, useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { ArrowLeft, Menu } from "lucide-react";
 import { useMemo } from "react";
@@ -65,16 +65,17 @@ export default function WidgetChatScreen() {
   }, [widgetSettings]);
 
   const conversation = useQuery(
-    api.web.conversation.get,
+    api.widget.conversation.get,
     conversationId && widgetSessionId
       ? {
+          widgetSessionId,
           conversationId,
         }
       : "skip"
   );
 
   const messages = useThreadMessages(
-    api.web.messages.getMany,
+    api.widget.message.getMany,
     conversation?.threadId && widgetSessionId
       ? {
           threadId: conversation.threadId,
@@ -99,7 +100,7 @@ export default function WidgetChatScreen() {
     },
   });
 
-  const createMessage = useMutation(api.web.message.create);
+  const createMessage = useAction(api.widget.message.create);
 
   const onBack = () => {
     setConversationId(null);
@@ -114,8 +115,9 @@ export default function WidgetChatScreen() {
     form.reset();
 
     await createMessage({
-      conversationId: conversation._id,
-      message: values.message,
+      prompt: values.message,
+      threadId: conversation.threadId,
+      widgetSessionId,
     });
   };
 
@@ -147,7 +149,7 @@ export default function WidgetChatScreen() {
                 from={message.role === "user" ? "user" : "assistant"}
               >
                 <MessageContent>
-                  <Response>{message.text}</Response>
+                  <Response origin="">{message.text}</Response>
                 </MessageContent>
                 {message.role !== "user" && (
                   <DicebearAvatar
@@ -162,7 +164,8 @@ export default function WidgetChatScreen() {
         </ConversationContent>
       </Conversation>
       {suggestions.length > 0 &&
-        toUIMessages(messages.results ?? [])?.length <= 1 && (
+        toUIMessages(messages.results.filter((message) => !!message.text))
+          ?.length <= 1 && (
           <Suggestions className="flex w-full flex-col items-end p-2">
             {suggestions.map((suggestion) => (
               <Suggestion

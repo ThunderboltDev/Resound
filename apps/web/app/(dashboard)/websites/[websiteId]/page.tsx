@@ -20,12 +20,13 @@ import {
   DialogTrigger,
 } from "@workspace/ui/components/dialog";
 import { LoadingScreen } from "@workspace/ui/components/loading-screen";
-
 import { useMutation, useQuery } from "convex/react";
+import { ConvexError } from "convex/values";
 import { ExternalLink, Globe, Layers, Unlink, X } from "lucide-react";
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Pages } from "@/app/(dashboard)/websites/[websiteId]/pages";
 import { WebsiteStatus } from "@/app/(dashboard)/websites/[websiteId]/status";
 import { VerificationSection } from "@/app/(dashboard)/websites/[websiteId]/verification";
 import {
@@ -70,8 +71,12 @@ export default function WebsitePage() {
       await unlinkWebsite({ id: website._id });
       toast.success("Website unlinked");
       router.replace("/wesbsites");
-    } catch {
-      toast.error("Failed to unlink website");
+    } catch (error) {
+      toast.error(
+        error instanceof ConvexError
+          ? (error.data as { message: string }).message
+          : "Something went wrong!"
+      );
     }
   };
 
@@ -115,6 +120,15 @@ export default function WebsitePage() {
               <WebsiteStatus status={website.status} />
             </div>
 
+            {website.status === "verified" && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">
+                  Verification Method
+                </span>
+                <span>{website.verificationMethod}</span>
+              </div>
+            )}
+
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Linked On</span>
               <span>
@@ -124,9 +138,13 @@ export default function WebsitePage() {
           </CardContent>
         </Card>
 
-        <VerificationSection domain={domain} website={website} />
+        {website.status !== "verified" ? (
+          <VerificationSection domain={domain} website={website} />
+        ) : (
+          <Pages website={website} />
+        )}
 
-        <h3 className="mt-8">Danger Zone</h3>
+        <h2 className="mt-10">Danger Zone</h2>
         <div className="flex gap-2 justify-between items-center">
           <p className="text-muted-foreground">Unlink your website</p>
           <Dialog>

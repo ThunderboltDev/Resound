@@ -30,7 +30,7 @@ export default function WidgetSelectionScreen() {
     widgetSessionIdAtomFamily(organizationId ?? "")
   );
 
-  const createConversation = useMutation(api.conversation.create);
+  const createConversation = useMutation(api.widget.conversation.create);
 
   const handleNewConversation = async () => {
     setIsLoading(true);

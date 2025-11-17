@@ -5,9 +5,13 @@ import { InfiniteScrollRef } from "@workspace/ui/components/infinite-scroll-ref"
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { usePaginatedQuery } from "convex/react";
 import { formatDistanceToNow } from "date-fns";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { ArrowLeft } from "lucide-react";
-import { conversationIdAtom, screenAtom } from "@/components/widget/atoms";
+import {
+  conversationIdAtom,
+  screenAtom,
+  widgetSessionIdAtom,
+} from "@/components/widget/atoms";
 import WidgetFooter from "@/components/widget/footer";
 import WidgetHeader from "@/components/widget/header";
 
@@ -15,9 +19,11 @@ export default function WidgetInboxScreen() {
   const setScreen = useSetAtom(screenAtom);
   const setConversationId = useSetAtom(conversationIdAtom);
 
+  const widgetSessionId = useAtomValue(widgetSessionIdAtom);
+
   const conversations = usePaginatedQuery(
-    api.web.conversation.getMany,
-    {},
+    api.widget.conversation.getMany,
+    widgetSessionId ? { widgetSessionId } : "skip",
     { initialNumItems: 10 }
   );
 

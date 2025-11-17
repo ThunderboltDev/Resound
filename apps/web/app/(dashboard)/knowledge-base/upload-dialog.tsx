@@ -20,18 +20,18 @@ import {
   DropzoneEmptyState,
 } from "@/components/ui/dropzone";
 
-type UploadDialogProps = {
+interface UploadDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onFileUploadComplete?: () => void;
-};
+}
 
 export default function UploadDialog({
   open,
   onOpenChange,
   onFileUploadComplete,
 }: UploadDialogProps) {
-  const addFile = useAction(api.private.file.add);
+  const addFile = useAction(api.web.file.add);
 
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState<boolean>(false);

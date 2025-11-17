@@ -1,18 +1,26 @@
 "use client";
 
 import { cn } from "@workspace/ui/lib/utils";
-import { type ComponentProps, memo } from "react";
-import { Streamdown } from "streamdown";
-
-type ResponseProps = ComponentProps<typeof Streamdown>;
+import { memo } from "react";
+import { harden } from "rehype-harden";
+import { Streamdown, type StreamdownProps } from "streamdown";
 
 export const Response = memo(
-  ({ className, ...props }: ResponseProps) => (
+  ({ className, ...props }: StreamdownProps) => (
     <Streamdown
       className={cn(
         "size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
         className
       )}
+      rehypePlugins={[
+        [
+          harden,
+          {
+            allowedLinkPrefixes: ["*"],
+            defaultOrigin: "https://resound.qzz.io",
+          },
+        ],
+      ]}
       {...props}
     />
   ),

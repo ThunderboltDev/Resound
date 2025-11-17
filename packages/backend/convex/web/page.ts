@@ -1,12 +1,13 @@
 import { contentHashFromArrayBuffer } from "@convex-dev/rag";
 import * as cheerio from "cheerio";
 import { ConvexError, v } from "convex/values";
-import TurndownService from "turndown";
 import type { Id } from "@/_generated/dataModel";
 import rag from "@/ai/rag";
+import { htmlToMarkdown } from "@/lib/htmlToMarkdown";
+import { normalizeUrl } from "@/lib/url";
 import type { PageEntryMetadata } from "@/types";
 import { internal } from "../_generated/api";
-import { action, query } from "../_generated/server";
+import { action, mutation, query } from "../_generated/server";
 
 export const add = action({
   args: {
@@ -66,7 +67,19 @@ export const add = action({
       });
     }
 
-    const fullUrl = new URL(path, website.url).toString();
+    const fullUrl = normalizeUrl(path, website.url);
+
+    const existing = pages.find((page) => {
+      const existingUrl = normalizeUrl(page.path, website.url);
+      return existingUrl === fullUrl;
+    });
+
+    if (existing) {
+      throw new ConvexError({
+        code: "BAD_REQUEST",
+        message: "This page is already indexed",
+      });
+    }
 
     const response = await fetch(fullUrl);
 
@@ -80,17 +93,15 @@ export const add = action({
     const html = await response.text();
 
     const $ = cheerio.load(html);
-
     const title = $("title").text()?.trim() || "Untitled";
 
-    const turndown = new TurndownService();
-    const markdown = turndown.turndown(html);
+    const markdown = htmlToMarkdown(html);
 
     const { entryId } = await rag.add(ctx, {
       namespace: organizationId,
       text: markdown,
       key: fullUrl,
-      title: path,
+      title: fullUrl,
       metadata: {
         title,
         organizationId,
@@ -108,6 +119,104 @@ export const add = action({
       title,
       path,
     });
+  },
+});
+
+export const remove = mutation({
+  args: {
+    pageId: v.id("pages"),
+  },
+  handler: async (ctx, { pageId }) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      throw new ConvexError({
+        code: "UNAUTHORIZED",
+        message: "Identity not found",
+      });
+    }
+
+    const user = await ctx.db.get(identity.subject as Id<"users">);
+
+    if (!user) {
+      throw new ConvexError({
+        code: "UNAUTHORIZED",
+        message: "User not found",
+      });
+    }
+
+    const organizationId = user.currentOrganizationId;
+
+    if (!organizationId) {
+      throw new ConvexError({
+        code: "UNAUTHORIZED",
+        message: "organization id not found",
+      });
+    }
+
+    const page = await ctx.db.get(pageId);
+
+    if (!page) {
+      throw new ConvexError({
+        code: "BAD_REQUEST",
+        message: "",
+      });
+    }
+
+    const website = await ctx.db.get(page?.websiteId);
+
+    if (!website) {
+      throw new ConvexError({
+        code: "NOT_FOUND",
+        message: "Website not found",
+      });
+    }
+
+    if (website?.organizationId !== organizationId) {
+      throw new ConvexError({
+        code: "UNAUTHORIZED",
+        message: "You are not allowed to do that",
+      });
+    }
+
+    const namespace = await rag.getNamespace(ctx, {
+      namespace: organizationId,
+    });
+
+    if (!namespace) {
+      throw new ConvexError({
+        code: "UNAUTHORIZED",
+        message: "Invalid namespace",
+      });
+    }
+
+    const entry = await rag.getEntry(ctx, {
+      entryId: page.entryId,
+    });
+
+    if (!entry) {
+      throw new ConvexError({
+        code: "NOT_FOUND",
+        message: "entry not found",
+      });
+    }
+
+    if (entry.metadata?.organizationId !== organizationId) {
+      throw new ConvexError({
+        code: "UNAUTHORIZED",
+        message: "Invalid organization ID",
+      });
+    }
+
+    if (entry.metadata?.storageId) {
+      await ctx.storage.delete(entry.metadata.storageId as Id<"_storage">);
+    }
+
+    await rag.deleteAsync(ctx, {
+      entryId: page.entryId,
+    });
+
+    await ctx.db.delete(pageId);
   },
 });
 
